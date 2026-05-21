@@ -100,7 +100,7 @@
         .subtitle {
             color: var(--muted);
             font-size: 0.9rem;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
             line-height: 1.5;
         }
         
@@ -109,7 +109,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
         }
         
         .time-box {
@@ -149,24 +149,70 @@
             letter-spacing: 1px;
             font-weight: 500;
         }
+
+        /* SUPPORT EMAIL BUTTON */
+        .support-box {
+            margin-bottom: 35px;
+        }
+
+        .support-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(138, 43, 226, 0.1));
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .support-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(138, 43, 226, 0.2));
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+            transform: translateY(-2px);
+        }
         
-        /* FOOTER BRANDING */
+        /* FOOTER BRANDING WITH AUTHOR NAME */
         .footer-note {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.3);
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             padding-top: 20px;
         }
         
+        .footer-note p {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 4px;
+        }
+
         .footer-note span {
             color: var(--primary);
             font-family: 'Orbitron', sans-serif;
+        }
+
+        .author-sig {
+            font-size: 0.7rem !important;
+            color: var(--muted) !important;
+            letter-spacing: 0.5px;
+        }
+
+        .author-sig strong {
+            color: #fff;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
         }
 
         @media (max-width: 400px) {
             .num { font-size: 1.5rem; }
             .label { font-size: 0.6rem; }
             .logo { font-size: 1.9rem; }
+            .support-btn { padding: 10px 20px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -202,9 +248,16 @@
                     <span class="label">Secs</span>
                 </div>
             </div>
+
+            <div class="support-box">
+                <a href="mailto:support@refer-zone.online" class="support-btn">
+                    ✉️ Contact Support
+                </a>
+            </div>
             
             <div class="footer-note">
                 <p>© 2026 <span>REFER-ZONE</span>. All Rights Reserved.</p>
+                <p class="author-sig">Powered by <strong>Muhammad Abdullah</strong></p>
             </div>
             
         </div>
