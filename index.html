@@ -257,7 +257,7 @@
             
             <div class="footer-note">
                 <p>© 2026 <span>REFER-ZONE</span>. All Rights Reserved.</p>
-                <p class="author-sig">Powered by <strong>Muhammad Abdullah</strong></p>
+                <p class="author-sig">Powered by <strong>Muhammad Abdullah Allah Ditta</strong></p>
             </div>
             
         </div>
