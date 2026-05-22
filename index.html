@@ -25,6 +25,7 @@
             --primary: #00e5ff;
             --secondary: #8a2be2;
             --success: #00ff99;
+            --reward-glow: rgba(255, 215, 0, 0.3);
         }
         
         body {
@@ -160,19 +161,22 @@
             font-weight: 500;
         }
 
-        /* SUPPORT EMAIL BUTTON */
-        .support-box {
+        /* ACTIONS SECTION (REWARD + SUPPORT) */
+        .actions-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             margin-bottom: 35px;
+            align-items: center;
         }
 
-        .support-btn {
+        .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(138, 43, 226, 0.1));
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            color: #ffffff;
+            width: 100%;
+            max-width: 280px;
             padding: 12px 24px;
             border-radius: 50px;
             font-size: 0.85rem;
@@ -183,11 +187,42 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .support-btn:hover {
-            background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(138, 43, 226, 0.2));
-            border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        /* ADSTERRA REWARD BUTTON (GOLDEN NEON GLOW) */
+        .reward-btn {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border: 1px solid #ffd700;
+            color: #050816;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            animation: pulseGlow 2s infinite;
+        }
+
+        .reward-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+            background: linear-gradient(135deg, #ffe033, #ffa500);
+        }
+
+        /* SUPPORT EMAIL BUTTON */
+        .support-btn {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.05), rgba(138, 43, 226, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .support-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(138, 43, 226, 0.15));
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.45); }
+            100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
         }
         
         /* FOOTER BRANDING WITH AUTHOR NAME */
@@ -222,7 +257,7 @@
             .num { font-size: 1.5rem; }
             .label { font-size: 0.6rem; }
             .logo { font-size: 1.9rem; }
-            .support-btn { padding: 10px 20px; font-size: 0.8rem; }
+            .btn { padding: 10px 20px; font-size: 0.8rem; }
             .launch-date-text { font-size: 1rem; }
         }
     </style>
@@ -261,8 +296,12 @@
                 </div>
             </div>
 
-            <div class="support-box">
-                <a href="mailto:support@refer-zone.online" class="support-btn">
+            <div class="actions-box">
+                <a href="https://www.effectivecpmnetwork.com/ye61iw1vfp?key=89962052ec5f321ea91cc5cfa8c59bef" target="_blank" class="btn reward-btn">
+                    🎁 Claim Early Reward
+                </a>
+                
+                <a href="mailto:support@refer-zone.online" class="btn support-btn">
                     ✉️ Contact Support
                 </a>
             </div>
@@ -304,6 +343,7 @@
                 document.getElementById("secs").textContent = "00";
                 document.querySelector("h2").textContent = "We Are Live! 🎉";
                 document.querySelector(".launch-date-text").style.display = "none";
+                document.querySelector(".reward-btn").style.display = "none";
             }
         }, 1000);
     </script>
