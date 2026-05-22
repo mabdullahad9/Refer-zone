@@ -93,8 +93,18 @@
         h2 {
             font-size: 1.4rem;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             color: #fff;
+        }
+
+        .launch-date-text {
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
         }
         
         .subtitle {
@@ -213,6 +223,7 @@
             .label { font-size: 0.6rem; }
             .logo { font-size: 1.9rem; }
             .support-btn { padding: 10px 20px; font-size: 0.8rem; }
+            .launch-date-text { font-size: 1rem; }
         }
     </style>
 </head>
@@ -227,7 +238,8 @@
                 <span class="badge">Next-Gen Earning</span>
             </div>
             
-            <h2>We Are Launching Soon! 🚀</h2>
+            <h2>We Are Launching On:</h2>
+            <div class="launch-date-text">20 JUNE 2026 🚀</div>
             <p class="subtitle">Our professional high-yield referral & multi-server ad rewarding ecosystem is currently under development.</p>
             
             <div class="countdown-grid">
@@ -264,8 +276,8 @@
     </div>
 
     <script>
-        // Target Launch Date Configuration: June 14, 2026
-        const launchDate = new Date("June 14, 2026 00:00:00").getTime();
+        // Target Launch Date Configuration: June 20, 2026
+        const launchDate = new Date("June 20, 2026 00:00:00").getTime();
 
         const timerEngine = setInterval(() => {
             const now = new Date().getTime();
@@ -291,6 +303,7 @@
                 document.getElementById("mins").textContent = "00";
                 document.getElementById("secs").textContent = "00";
                 document.querySelector("h2").textContent = "We Are Live! 🎉";
+                document.querySelector(".launch-date-text").style.display = "none";
             }
         }, 1000);
     </script>
