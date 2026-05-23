@@ -613,5 +613,155 @@
                 
                 resetValidationUI();
 
-                /* If link is referral link, autofill the input box instantly and lock it */
+                                /* If link is referral link, autofill the input box instantly and lock it */
+                if (referralFromUrl) {
+                    const referInput = document.getElementById("refer");
+                    referInput.value = referralFromUrl.trim().toUpperCase();
+                    referInput.disabled = true;
+                    showToast("Referral Code Automatically Applied! 🎉", "success");
+                }
+            }
+        }
+
+        function resetValidationUI() {
+            document.getElementById("lengthRule").className = "rule";
+            document.getElementById("upperRule").className = "rule";
+            document.getElementById("numberRule").className = "rule";
+            document.getElementById("specialRule").className = "rule";
+        }
+
+        /* PASSWORD VISIBILITY TOGGLE SYSTEM */
+        function togglePassword() {
+            const pass = document.getElementById("password");
+            const toggle = document.querySelector(".toggle-pass");
+
+            if (pass.type === "password") {
+                pass.type = "text";
+                toggle.innerText = "HIDE";
+            } else {
+                pass.type = "password";
+                toggle.innerText = "SHOW";
+            }
+        }
+
+        /* SECURITY CRITERIA INPUT PASS VALIDATOR GRID */
+        document.getElementById("password").addEventListener("input", () => {
+            if (isLogin) {
+                document.getElementById("btn").disabled = false;
+                return;
+            }
+
+            const pass = document.getElementById("password").value;
+            const length = pass.length >= 8;
+            const upper = /[A-Z]/.test(pass);
+            const number = /\d/.test(pass);
+            const special = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
+
+            document.getElementById("lengthRule").classList.toggle("valid", length);
+            document.getElementById("upperRule").classList.toggle("valid", upper);
+            document.getElementById("numberRule").classList.toggle("valid", number);
+            document.getElementById("specialRule").classList.toggle("valid", special);
+
+            strongPassword = length && upper && number && special;
+            document.getElementById("btn").disabled = !strongPassword;
+        });
+
+        /* DATA PROCESSING CORE SIGNUP/LOGIN CORE ENGINE */
+        document.getElementById("authForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const name = document.getElementById("name").value.trim();
+            const referredByCode = document.getElementById("refer").value.trim().toUpperCase();
+            const btn = document.getElementById("btn");
+
+            if (!email || !password) {
+                showToast("Please fill all required fields", "error");
+                return;
+            }
+
+            btn.innerHTML = `Processing <span class="spinner"></span>`;
+            btn.disabled = true;
+
+            try {
+                /* LOGIN LOGIC STREAM */
+                if (isLogin) {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    showToast("Login Successful", "success");
+                } 
+                /* REGISTRATION SIGN UP STREAM */
+                else {
+                    if (!name) {
+                        showToast("Username Required", "error");
+                        btn.disabled = false;
+                        btn.innerText = "SIGN UP";
+                        return;
+                    }
+
+                    // 1. Fire registration authentication task
+                    const res = await auth.createUserWithEmailAndPassword(email, password);
+                    
+                    // 2. Map structural public display identity parameters
+                    await res.user.updateProfile({ displayName: name });
+
+                    const myGeneratedReferral = generateReferralCode(res.user.uid);
+                    let referralBonusDistributed = false;
+
+                    // 3. Trigger Referrer verification stream if parameter exists
+                    if (referredByCode) {
+                        const usersRef = db.collection("users");
+                        const snapshot = await usersRef.where('referralCode', '==', referredByCode).get();
+
+                        if (!snapshot.empty) {
+                            const referrerDoc = snapshot.docs[0];
+                            const currentReferrerBalance = referrerDoc.data().balance || 0;
+
+                            // Dynamic payout addition loop (Rs. 10 added to inviter)
+                            await db.collection("users").doc(referrerDoc.id).update({
+                                balance: currentReferrerBalance + 10
+                            });
+                            referralBonusDistributed = true;
+                        }
+                    }
+
+                    // 4. Save new account data profile entry mapping inside Firestore with Rs. 10 signup bonus
+                    await db.collection("users").doc(res.user.uid).set({
+                        name: name,
+                        balance: 10, // 🎁 Rs. 10 Welcome Bonus to the new sign up!
+                        referralCode: myGeneratedReferral,
+                        lastBonusDate: "",
+                        referredBy: referralBonusDistributed ? referredByCode : ""
+                    });
+
+                    if (referralBonusDistributed) {
+                        showToast("Account Created! You & Friend Received Rs.10! 🎉", "success");
+                    } else {
+                        showToast("Account Created! Rs.10 Signup Reward Added! 🎁", "success");
+                    }
+                }
+
+                // Smooth relocation routing path trigger
+                setTimeout(() => {
+                    window.location.href = "home.html";
+                }, 1500);
+
+            } catch (err) {
+                console.error(err);
+                let message = err.message;
+
+                if (err.code === "auth/user-not-found") message = "Account Not Found";
+                if (err.code === "auth/wrong-password") message = "Wrong Password";
+                if (err.code === "auth/email-already-in-use") message = "Email Already Used";
+                if (err.code === "auth/invalid-email") message = "Invalid Email";
+                if (err.code === "auth/weak-password") message = "Weak Password";
+
+                showToast(message, "error");
+                btn.disabled = isLogin ? false : !strongPassword;
+                btn.innerText = isLogin ? "LOGIN" : "SIGN UP";
+            }
+        });
+    </script>
+</body>
+</html>
   
