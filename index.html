@@ -2,358 +2,491 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Refer-Zone | Launching Soon</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#060816">
+    <title>Refer-Zone Secure Login</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         :root {
-            --bg1: #050816;
-            --bg2: #0b1026;
-            --glass: rgba(255, 255, 255, 0.04);
+            --primary: #00f7ff;
+            --secondary: #7b2cff;
+            --success: #00ffae;
+            --danger: #ff3d6e;
+            --dark: #060816;
+            --card: rgba(255, 255, 255, 0.06);
             --border: rgba(255, 255, 255, 0.08);
-            --text: #ffffff;
-            --muted: #9fb0ff;
-            --primary: #00e5ff;
-            --secondary: #8a2be2;
-            --success: #00ff99;
-            --warning: #ffb700;
         }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            background:
-                radial-gradient(circle at top left, rgba(0, 229, 255, 0.15), transparent 45%),
-                radial-gradient(circle at bottom right, rgba(138, 43, 226, 0.15), transparent 45%),
-                linear-gradient(135deg, var(--bg1), var(--bg2));
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+
+        html, body {
+            width: 100%;
             overflow-x: hidden;
         }
-        
-        .container {
-            width: 100%;
-            max-width: 480px;
-            text-align: center;
-        }
-        
-        .glass-panel {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 32px;
-            padding: 35px 20px;
-            box-shadow:
-                0 0 40px rgba(0, 229, 255, 0.05),
-                inset 0 0 25px rgba(255, 255, 255, 0.02);
-        }
-        
-        .logo-box { margin-bottom: 20px; }
-        
-        .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.3rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 229, 255, 0.2);
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 6px 16px;
-            background: rgba(0, 229, 255, 0.1);
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            color: var(--primary);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 700;
-            border-radius: 50px;
-            margin-top: 5px;
-            text-transform: uppercase;
-        }
-        
-        h2 { font-size: 1.3rem; font-weight: 600; margin-bottom: 5px; color: #fff; }
-        .launch-date-text {
-            color: var(--primary);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
-        }
-        
-        .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5; }
 
-        /* SCOREBOARD & LIMITS */
-        .points-display {
-            background: rgba(255, 183, 0, 0.08);
-            border: 1px solid rgba(255, 183, 0, 0.15);
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 15px;
-            font-family: 'Orbitron', sans-serif;
-            color: var(--warning);
-            font-size: 0.95rem;
-            font-weight: 700;
-        }
-
-        .limit-text {
-            font-size: 0.75rem;
-            color: var(--muted);
-            margin-top: 5px;
-            display: block;
-        }
-        
-        /* BACKUP UTILITY BOX */
-        .backup-box {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 25px;
-        }
-        .backup-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .backup-btn:hover { background: rgba(255,255,255,0.15); border-color: var(--primary); }
-
-        /* COUNTDOWN GRID */
-        .countdown-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 25px;
-        }
-        .time-box {
-            background: rgba(5, 8, 22, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 12px 5px;
-            border-radius: 14px;
-            position: relative;
-        }
-        .num {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--success);
-            display: block;
-        }
-        .label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; }
-
-        /* ACTIONS SECTION */
-        .actions-box {
+        body {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 25px;
-            align-items: center;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
             justify-content: center;
-            gap: 8px;
-            width: 100%;
-            max-width: 280px;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            align-items: center;
+            padding: 18px;
+            background: #060816;
+            font-family: 'Poppins', sans-serif;
+            position: relative;
         }
-        .reward-btn {
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            border: 1px solid #ffd700;
-            color: #050816;
-            text-transform: uppercase;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-        }
-        .reward-btn.disabled {
-            background: #222533 !important;
-            border-color: #33374d !important;
-            color: #666e8c !important;
-            cursor: not-allowed;
-        }
-        .support-btn {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-        }
-        
-        .footer-note { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 15px; }
-        .footer-note p { font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); margin-bottom: 4px; }
-        .footer-note span { color: var(--primary); font-family: 'Orbitron', sans-serif; }
-        .author-sig { font-size: 0.7rem !important; color: var(--muted) !important; margin-bottom: 8px; }
 
-        /* LEGAL LINKS STYLE BLOCK */
-        .legal-links {
+        /* ADSTERRA BANNER DISPLAY TARGETS */
+        .ad-banner-space {
+            width: 100%;
+            max-width: 320px;
+            min-height: 50px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin: 15px auto;
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 15px;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+        }
+
+        /* BACKGROUND */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at top left, rgba(0, 247, 255, 0.18), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(123, 44, 255, 0.22), transparent 30%);
+            z-index: -2;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            width: 320px;
+            height: 320px;
+            background: rgba(0, 247, 255, 0.10);
+            border-radius: 50%;
+            filter: blur(110px);
+            bottom: -120px;
+            right: -120px;
+            z-index: -1;
+        }
+
+        /* CARD */
+        .card {
+            width: 100%;
+            max-width: 420px;
+            padding: 30px 20px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 30px rgba(0, 247, 255, 0.12);
+            position: relative;
+            overflow: hidden;
+            animation: cardLoad .7s ease;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(0, 247, 255, 0.45), rgba(123, 44, 255, 0.35));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        @keyframes cardLoad {
+            from {
+                opacity: 0;
+                transform: translateY(35px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* LOGO */
+        .logo {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: white;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--primary), 0 0 25px var(--primary);
+        }
+
+        .logo p {
+            color: #cbd5e1;
+            font-size: 14px;
             margin-top: 10px;
         }
-        .legal-links a {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.3);
-            text-decoration: none;
-            transition: color 0.2s;
+
+        /* INPUTS */
+        .input-box {
+            position: relative;
+            margin-top: 18px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 15px 50px 15px 16px;
+            border: none;
+            outline: none;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.07);
+            color: white;
+            font-size: 15px;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+
+        .input-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 18px rgba(0, 247, 255, 0.25);
+        }
+
+        .input-box input::placeholder {
+            color: #94a3b8;
+        }
+
+        .input-box input:disabled {
+            background: rgba(0, 247, 255, 0.05);
+            border-color: rgba(0, 247, 255, 0.2);
+            color: var(--success);
+            cursor: not-allowed;
+        }
+
+        /* PASSWORD TOGGLE */
+        .toggle-pass {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* PASSWORD RULES */
+        .rules {
+            display: none;
+            margin-top: 14px;
+        }
+
+        .rule {
+            font-size: 12px;
+            color: #ff3d6e;
+            margin-top: 6px;
+            transition: 0.3s;
+        }
+
+        .valid {
+            color: var(--success);
+        }
+
+        /* BUTTON */
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 15px;
+            border: none;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.35s;
+            box-shadow: 0 0 22px rgba(0, 247, 255, 0.30);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 35px rgba(0, 247, 255, 0.55);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* TOGGLE */
+        .toggle {
+            margin-top: 22px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .toggle span {
+            color: var(--primary);
+            font-weight: 600;
             cursor: pointer;
         }
-        .legal-links a:hover {
+
+        /* LEGAL FOOTER NAVIGATION */
+        .legal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+        }
+
+        .legal-footer a {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .legal-footer a:hover {
             color: var(--primary);
         }
 
-        /* MODAL WINDOW MATRIX SYSTEM (POPUP) */
+        /* MODAL WINDOW SYSTEM STYLE BLOCK */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 8, 22, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(6, 8, 22, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 10000;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
             padding: 20px;
         }
+
         .modal-overlay.active {
             opacity: 1;
             pointer-events: auto;
         }
+
         .modal-box {
             background: #0b1026;
             border: 1px solid var(--border);
             border-radius: 24px;
             width: 100%;
-            max-width: 500px;
-            max-height: 80vh;
+            max-width: 480px;
+            max-height: 75vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transform: scale(0.9);
+            box-shadow: 0 0 40px rgba(0, 247, 255, 0.15);
+            transform: scale(0.95);
             transition: transform 0.3s ease;
         }
+
         .modal-overlay.active .modal-box {
             transform: scale(1);
         }
+
         .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .modal-header h3 {
             font-family: 'Orbitron', sans-serif;
             color: var(--primary);
-            font-size: 1.1rem;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
         }
+
         .close-modal {
             background: none;
             border: none;
-            color: #fff;
-            font-size: 1.5rem;
+            color: white;
+            font-size: 1.6rem;
             cursor: pointer;
-            opacity: 0.5;
+            opacity: 0.6;
             transition: opacity 0.2s;
         }
+
         .close-modal:hover { opacity: 1; }
+
         .modal-body {
             padding: 20px;
             overflow-y: auto;
             text-align: left;
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             line-height: 1.6;
-            color: rgba(255,255,255,0.7);
+            color: #cbd5e1;
         }
+
         .modal-body h4 {
-            color: #fff;
-            margin: 15px 0 5px 0;
-            font-size: 0.85rem;
+            color: white;
+            margin: 15px 0 6px 0;
+            font-size: 0.9rem;
+            border-left: 2px solid var(--primary);
+            padding-left: 8px;
         }
-        .modal-body p { margin-bottom: 10px; }
-        .modal-body ul { margin-left: 15px; margin-bottom: 10px; }
+
+        .modal-body p { margin-bottom: 12px; }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 220px;
+            max-width: 92%;
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 14px;
+            text-align: center;
+            z-index: 99999;
+            backdrop-filter: blur(15px);
+            animation: toastShow .3s ease;
+        }
+
+        .success {
+            background: rgba(0, 255, 174, 0.10);
+            border: 1px solid var(--success);
+            color: var(--success);
+            box-shadow: 0 0 18px rgba(0, 255, 174, 0.20);
+        }
+
+        .error {
+            background: rgba(255, 61, 110, 0.12);
+            border: 1px solid var(--danger);
+            color: #ff6b8f;
+            box-shadow: 0 0 18px rgba(255, 61, 110, 0.22);
+        }
+
+        .hidden { display: none; }
+
+        @keyframes toastShow {
+            from { opacity: 0; transform: translate(-50%, -25px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        /* SPINNER */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* MOBILE */
+        @media(max-width:480px) {
+            body { padding: 14px; }
+            .card { padding: 26px 16px; border-radius: 24px; }
+            .logo h1 { font-size: 1.7rem; }
+            .input-box input { font-size: 16px; }
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="glass-panel">
-            
-            <div class="logo-box">
-                <div class="logo">REFER-ZONE</div>
-                <span class="badge">Next-Gen Earning</span>
-            </div>
-            
-            <h2>We Are Launching On:</h2>
-            <div class="launch-date-text">20 JUNE 2026 🚀</div>
-            
-            <div class="points-display">
-                💰 Launch Rewards: <span id="user-points">0</span> Points
-                <span class="limit-text" id="click-limit-text">Remaining Claims Today: 5/5</span>
-            </div>
+    <div class="toast hidden" id="toast"></div>
 
-            <div class="backup-box">
-                <button class="backup-btn" onclick="copyBackupKey()">🔑 Copy Backup Key</button>
-                <button class="backup-btn" onclick="restoreBackupKey()">📥 Load Backup Key</button>
-            </div>
-            
-            <div class="countdown-grid">
-                <div class="time-box"><span class="num" id="days">00</span><span class="label">Days</span></div>
-                <div class="time-box"><span class="num" id="hours">00</span><span class="label">Hours</span></div>
-                <div class="time-box"><span class="num" id="mins">00</span><span class="label">Mins</span></div>
-                <div class="time-box"><span class="num" id="secs">00</span><span class="label">Secs</span></div>
-            </div>
-
-            <div class="actions-box">
-                <a id="reward-action-btn" class="btn reward-btn">🎁 Claim Early Reward</a>
-                <a href="mailto:support@refer-zone.online" class="btn support-btn">✉️ Contact Support</a>
-            </div>
-            
-            <div class="footer-note">
-                <p>© 2026 <span>REFER-ZONE</span>. All Rights Reserved.</p>
-                <p class="author-sig">Powered by <strong>Muhammad Abdullah Allah Ditta</strong></p>
-                
-                <div class="legal-links">
-                    <a onclick="openModal('privacy-modal')">Privacy Policy</a>
-                    <a onclick="openModal('terms-modal')">Terms & Conditions</a>
-                </div>
-            </div>
-            
+    <div class="ad-banner-space">
+        <span>Adsterra Native Banner (Top Ad Space)</span>
         </div>
+
+    <div class="card">
+
+        <div class="logo">
+            <h1>REFER-ZONE</h1>
+            <p id="title">Login To Continue</p>
+        </div>
+
+        <form id="authForm">
+
+            <div class="input-box" id="nameBox" style="display:none;">
+                <input type="text" id="name" placeholder="Username">
+            </div>
+
+            <div class="input-box" id="referBox" style="display:none;">
+                <input type="text" id="refer" placeholder="Referral Code (Optional)">
+            </div>
+
+            <div class="input-box">
+                <input type="email" id="email" placeholder="Email Address" required>
+            </div>
+
+            <div class="input-box">
+                <input type="password" id="password" placeholder="Password" required>
+                <span class="toggle-pass" onclick="togglePassword()">SHOW</span>
+            </div>
+
+            <div class="rules" id="rules">
+                <div class="rule" id="lengthRule">• Minimum 8 characters</div>
+                <div class="rule" id="upperRule">• One uppercase letter</div>
+                <div class="rule" id="numberRule">• One number</div>
+                <div class="rule" id="specialRule">• One special character</div>
+            </div>
+
+            <button type="submit" id="btn">LOGIN</button>
+        </form>
+
+        <div class="toggle" id="toggleText">
+            New User? <span onclick="toggleMode()">Create Account</span>
+        </div>
+
+        <div class="legal-footer">
+            <a onclick="openModal('privacy-modal')">Privacy Policy</a>
+            <a onclick="openModal('terms-modal')">Terms & Conditions</a>
+        </div>
+
     </div>
+
+    <div class="ad-banner-space">
+        <span>Adsterra Display Banner (Bottom Ad Space)</span>
+        </div>
+
 
     <div id="privacy-modal" class="modal-overlay">
         <div class="modal-box">
@@ -363,23 +496,20 @@
             </div>
             <div class="modal-body">
                 <p><strong>Last Updated: May 2026</strong></p>
-                <p>Welcome to Refer-Zone.online. We respect your privacy and are committed to protecting it. This policy explains how we handle data during our pre-launch events phase.</p>
+                <p>Welcome to Refer-Zone. We ensure your personal data protection with maximum encryption standards.</p>
                 
-                <h4>1. Information Collection</h4>
-                <p>We do NOT collect personal data such as your name, email, or IP address on our servers during this countdown phase. All reward points and daily event timers are strictly stored on your own device using local browser storage (localStorage).</p>
+                <h4>1. Data We Collect</h4>
+                <p>When you create an account, we store your profile username, hashed security password credentials, and current transaction ledger balance securely inside Google Firebase systems.</p>
                 
-                <h4>2. Ad Networks & Third-Party Cookies</h4>
-                <p>We partner with Adsterra and other standard third-party advertising networks to fund our launch rewards ecosystem. When you click on "Claim Early Reward", third-party ad systems may use cookies or device tracking matrices to deliver target advertisements. We do not have direct access to or control over these third-party trackers.</p>
+                <h4>2. Cookies & Advertising</h4>
+                <p>We work closely with third-party networks like Adsterra. These display systems analyze device impressions to deliver clean targeted web banner structures. No real financial or personal data leaks occur during this integration process.</p>
                 
-                <h4>3. Data Security</h4>
-                <p>Since your reward points are stored inside your local browser cache memory, clearing your history or browser storage will wipe your points data. We provide a manual cryptographic Backup Key tool to let you save, download, and copy your score records locally on your device.</p>
-                
-                <h4>4. Changes to This Policy</h4>
-                <p>We will upgrade this policy significantly on June 20, 2026, when our full server architecture, Firebase user login panels, and account systems go live.</p>
-                <p>For any queries, reach out via: <strong>support@refer-zone.online</strong></p>
+                <h4>3. Account Retention</h4>
+                <p>Your records remain safe on cloud databases. Clearing local browser history will NOT delete your financial balances since accounts are now bounded with authentic database structures.</p>
             </div>
         </div>
     </div>
+
 
     <div id="terms-modal" class="modal-overlay">
         <div class="modal-box">
@@ -389,141 +519,248 @@
             </div>
             <div class="modal-body">
                 <p><strong>Last Updated: May 2026</strong></p>
-                <p>By accessing Refer-Zone.online and taking part in our pre-launch booster reward events, you fully agree to the legal terms stated below.</p>
+                <p>Please review our official ecosystem policies before creating your primary node profile registration wallet.</p>
                 
-                <h4>1. Reward Points Eligibility</h4>
-                <p>All points accumulated during this pre-launch booster countdown phase are free promotional items. They carry no real-world cash value until the platform's official launch on June 20, 2026, where they can be migrated into real network dashboard balances.</p>
+                <h4>1. Sign Up Rewards Logic</h4>
+                <p>Every single validated clean activation yields a welcome reward of <strong>Rs. 10 PKR</strong> instant ledger credits immediately deposited inside the central user profile balance node.</p>
                 
-                <h4>2. Anti-Fraud & Fair Use Rule</h4>
-                <p>Users are strictly permitted a maximum limit of 5 Reward Claims per 24-hour cycle. Any attempt to manipulate system rules, bypass the cooldown locks, use scripts, bots, auto-clickers, proxies, or perform spam click methods to generate artificial points will trigger automatic invalid logic system loops. This will result in permanent blacklisting of your backup key and a complete ban on the main app registration.</p>
+                <h4>2. Referral Multipliers</h4>
+                <p>Sharing your automatic unique referral tracking sequence grants you <strong>Rs. 10 PKR</strong> upon every successful registration completed by your friends. Falsifying links triggers validation failures.</p>
                 
-                <h4>3. Device Storage Liability</h4>
-                <p>Refer-Zone is not responsible for points lost due to browser uninstallation, history cleaning, mobile formatting, or loss of your generated cryptographic Backup Key code.</p>
-                
-                <h4>4. Modification of Event Rules</h4>
-                <p>The management reserves full rights to reset, audit, scale or terminate reward mechanics to protect platform ecosystem integrity against massive click fraud or malicious exploitations.</p>
+                <h4>3. Strict Anti-Fraud Regulation</h4>
+                <p>Self-referrals, deployment of automation click tools, creating temporary virtual emails, or script-running sequences inside login modules results in an automatic system-wide IP ban, resetting your wallet metrics instantly.</p>
             </div>
         </div>
     </div>
 
+
     <script>
-        const launchDate = new Date("June 20, 2026 00:00:00").getTime();
-        const adLink = "https://www.effectivecpmnetwork.com/ye61iw1vfp?key=89962052ec5f321ea91cc5cfa8c59bef";
-        const maxClaimsPerDay = 5;
+        /* FIREBASE CONFIGURATION CODES */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkc84Awm5Jv6S886jeztxVX-ISq7gNlpE",
+            authDomain: "refer-zone-213bf.firebaseapp.com",
+            projectId: "refer-zone-213bf",
+            storageBucket: "refer-zone-213bf.firebasestorage.app",
+            messagingSenderId: "985924046754",
+            appId: "1:985924046754:web:95a33081ec1029792cacfb",
+            measurementId: "G-EW3Q3QYYH1"
+        };
 
-        // Core State Engine Loading
-        let currentPoints = parseInt(localStorage.getItem('rz_points')) || 0;
-        let todayClaims = parseInt(localStorage.getItem('rz_today_claims')) || 0;
-        let lastClaimDate = localStorage.getItem('rz_last_claim_date') || "";
+        /* INITIALIZE FIREBASE COMPLIANCE LAYER */
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        const actionBtn = document.getElementById('reward-action-btn');
-        const pointsDisplay = document.getElementById('user-points');
-        const limitDisplay = document.getElementById('click-limit-text');
+        let isLogin = true;
+        let strongPassword = false;
 
-        // Modal Utility Methods
+        /* AUTOMATIC URL PARAMETER REFERRAL SCANNER */
+        const urlParams = new URLSearchParams(window.location.search);
+        const referralFromUrl = urlParams.get('ref');
+
+        /* LEGAL MODAL MANAGEMENT UTILITIES */
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        function checkMidnightReset() {
-            const currentDateString = new Date().toDateString();
-            if (lastClaimDate !== currentDateString) {
-                todayClaims = 0;
-                localStorage.setItem('rz_today_claims', 0);
-                localStorage.setItem('rz_last_claim_date', currentDateString);
-            }
+        /* TOAST ALERTS WINDOW SYSTEM TIMER MANAGEMENT */
+        let toastTimeout;
+        function showToast(msg, type) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.className = `toast ${type}`;
+            toast.classList.remove("hidden");
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 3000);
         }
 
-        function updateUI() {
-            checkMidnightReset();
-            pointsDisplay.textContent = currentPoints;
-            limitDisplay.textContent = `Remaining Claims Today: ${maxClaimsPerDay - todayClaims}/${maxClaimsPerDay}`;
+        /* DYNAMIC REFERRAL KEY ALGORITHM CREATOR */
+        function generateReferralCode(uid) {
+            return "REF" + uid.substring(0, 6).toUpperCase();
+        }
 
-            if (todayClaims >= maxClaimsPerDay) {
-                actionBtn.classList.add('disabled');
-                actionBtn.removeAttribute('href');
-                actionBtn.removeAttribute('target');
-                actionBtn.textContent = "Limit Reached! Reset at 12 AM";
+        /* INTERFACE RE-RENDERING SWITCH MODULES */
+        function toggleMode() {
+            isLogin = !isLogin;
+            const title = document.getElementById("title");
+            const btn = document.getElementById("btn");
+            const rules = document.getElementById("rules");
+            const nameBox = document.getElementById("nameBox");
+            const referBox = document.getElementById("referBox");
+            const toggleText = document.getElementById("toggleText");
+
+            document.getElementById("authForm").reset();
+            strongPassword = false;
+            btn.disabled = false;
+
+            if (isLogin) {
+                title.innerText = "Login To Continue";
+                btn.innerText = "LOGIN";
+                rules.style.display = "none";
+                nameBox.style.display = "none";
+                referBox.style.display = "none";
+                toggleText.innerHTML = `New User? <span onclick="toggleMode()">Create Account</span>`;
             } else {
-                actionBtn.classList.remove('disabled');
-                actionBtn.setAttribute('href', adLink);
-                actionBtn.setAttribute('target', '_blank');
-                actionBtn.textContent = "🎁 Claim Early Reward";
+                title.innerText = "Create New Account";
+                btn.innerText = "SIGN UP";
+                rules.style.display = "block";
+                nameBox.style.display = "block";
+                referBox.style.display = "block";
+                btn.disabled = true;
+                toggleText.innerHTML = `Already have account? <span onclick="toggleMode()">Sign In</span>`;
+                
+                resetValidationUI();
+
+                /* If link is referral link, autofill the input box instantly and lock it */
+                if (referralFromUrl) {
+                    const referInput = document.getElementById("refer");
+                    referInput.value = referralFromUrl.trim().toUpperCase();
+                    referInput.disabled = true;
+                    showToast("Referral Code Automatically Applied! 🎉", "success");
+                }
             }
         }
 
-        actionBtn.addEventListener('click', (e) => {
-            checkMidnightReset();
-            if (todayClaims >= maxClaimsPerDay) {
-                e.preventDefault();
+        function resetValidationUI() {
+            document.getElementById("lengthRule").className = "rule";
+            document.getElementById("upperRule").className = "rule";
+            document.getElementById("numberRule").className = "rule";
+            document.getElementById("specialRule").className = "rule";
+        }
+
+        /* PASSWORD VISIBILITY TOGGLE SYSTEM */
+        function togglePassword() {
+            const pass = document.getElementById("password");
+            const toggle = document.querySelector(".toggle-pass");
+
+            if (pass.type === "password") {
+                pass.type = "text";
+                toggle.innerText = "HIDE";
+            } else {
+                pass.type = "password";
+                toggle.innerText = "SHOW";
+            }
+        }
+
+        /* SECURITY CRITERIA INPUT PASS VALIDATOR GRID */
+        document.getElementById("password").addEventListener("input", () => {
+            if (isLogin) {
+                document.getElementById("btn").disabled = false;
                 return;
             }
 
-            currentPoints += 10;
-            todayClaims += 1;
-            
-            localStorage.setItem('rz_points', currentPoints);
-            localStorage.setItem('rz_today_claims', todayClaims);
-            localStorage.setItem('rz_last_claim_date', new Date().toDateString());
+            const pass = document.getElementById("password").value;
+            const length = pass.length >= 8;
+            const upper = /[A-Z]/.test(pass);
+            const number = /\d/.test(pass);
+            const special = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
 
-            setTimeout(updateUI, 500);
+            document.getElementById("lengthRule").classList.toggle("valid", length);
+            document.getElementById("upperRule").classList.toggle("valid", upper);
+            document.getElementById("numberRule").classList.toggle("valid", number);
+            document.getElementById("specialRule").classList.toggle("valid", special);
+
+            strongPassword = length && upper && number && special;
+            document.getElementById("btn").disabled = !strongPassword;
         });
 
-        function copyBackupKey() {
-            if(currentPoints === 0) {
-                alert("Earn some points first before generating a backup key!");
+        /* DATA PROCESSING CORE SIGNUP/LOGIN CORE ENGINE */
+        document.getElementById("authForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const name = document.getElementById("name").value.trim();
+            const referredByCode = document.getElementById("refer").value.trim().toUpperCase();
+            const btn = document.getElementById("btn");
+
+            if (!email || !password) {
+                showToast("Please fill all required fields", "error");
                 return;
             }
-            const secureKey = btoa(`RZ-KEY-${currentPoints}-${Math.floor(1000 + Math.random() * 9000)}`);
-            navigator.clipboard.writeText(secureKey);
-            alert(`Your Point Backup Key Copied! 🔑\n\nKey: ${secureKey}\n\nSave this key somewhere safe. If your browser data clears, you can restore points using this key.`);
-        }
 
-        function restoreBackupKey() {
-            const inputKey = prompt("Enter your Point Backup Key to restore points:");
-            if (!inputKey) return;
+            btn.innerHTML = `Processing <span class="spinner"></span>`;
+            btn.disabled = true;
+
             try {
-                const decoded = atob(inputKey);
-                const parts = decoded.split('-');
-                if (parts[0] === "RZ" && parts[1] === "KEY") {
-                    const restoredPoints = parseInt(parts[2]);
-                    if(!isNaN(restoredPoints)) {
-                        currentPoints = restoredPoints;
-                        localStorage.setItem('rz_points', currentPoints);
-                        updateUI();
-                        alert(`Successfully restored ${restoredPoints} Points! 🎉`);
+                /* LOGIN LOGIC STREAM */
+                if (isLogin) {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    showToast("Login Successful", "success");
+                } 
+                /* REGISTRATION SIGN UP STREAM */
+                else {
+                    if (!name) {
+                        showToast("Username Required", "error");
+                        btn.disabled = false;
+                        btn.innerText = "SIGN UP";
+                        return;
                     }
-                } else { alert("Invalid Backup Key!"); }
-            } catch(e) { alert("Invalid Backup Key Format!"); }
-        }
 
-        updateUI();
+                    // 1. Fire registration authentication task
+                    const res = await auth.createUserWithEmailAndPassword(email, password);
+                    
+                    // 2. Map structural public display identity parameters
+                    await res.user.updateProfile({ displayName: name });
 
-        const timerEngine = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = launchDate - now;
+                    const myGeneratedReferral = generateReferralCode(res.user.uid);
+                    let referralBonusDistributed = false;
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    // 3. Trigger Referrer verification stream if parameter exists
+                    if (referredByCode) {
+                        const usersRef = db.collection("users");
+                        const snapshot = await usersRef.where('referralCode', '==', referredByCode).get();
 
-            document.getElementById("days").textContent = days < 10 ? "0" + days : days;
-            document.getElementById("hours").textContent = hours < 10 ? "0" + hours : hours;
-            document.getElementById("mins").textContent = minutes < 10 ? "0" + minutes : minutes;
-            document.getElementById("secs").textContent = seconds < 10 ? "0" + seconds : seconds;
+                        if (!snapshot.empty) {
+                            const referrerDoc = snapshot.docs[0];
+                            const currentReferrerBalance = referrerDoc.data().balance || 0;
 
-            if (distance < 0) {
-                clearInterval(timerEngine);
-                document.getElementById("days").textContent = "00";
-                document.getElementById("hours").textContent = "00";
-                document.getElementById("mins").textContent = "00";
-                document.getElementById("secs").textContent = "00";
-                document.querySelector("h2").textContent = "We Are Live! 🎉";
-                document.querySelector(".launch-date-text").style.display = "none";
-                actionBtn.style.display = "none";
+                            // Dynamic payout addition loop (Rs. 10 added to inviter)
+                            await db.collection("users").doc(referrerDoc.id).update({
+                                balance: currentReferrerBalance + 10
+                            });
+                            referralBonusDistributed = true;
+                        }
+                    }
+
+                    // 4. Save new account data profile entry mapping inside Firestore with Rs. 10 signup bonus
+                    await db.collection("users").doc(res.user.uid).set({
+                        name: name,
+                        balance: 10, // 🎁 Rs. 10 Welcome Bonus to the new sign up!
+                        referralCode: myGeneratedReferral,
+                        lastBonusDate: "",
+                        referredBy: referralBonusDistributed ? referredByCode : ""
+                    });
+
+                    if (referralBonusDistributed) {
+                        showToast("Account Created! You & Friend Received Rs.10! 🎉", "success");
+                    } else {
+                        showToast("Account Created! Rs.10 Signup Reward Added! 🎁", "success");
+                    }
+                }
+
+                // Smooth relocation routing path trigger
+                setTimeout(() => {
+                    window.location.href = "home.html";
+                }, 1500);
+
+            } catch (err) {
+                console.error(err);
+                let message = err.message;
+
+                if (err.code === "auth/user-not-found") message = "Account Not Found";
+                if (err.code === "auth/wrong-password") message = "Wrong Password";
+                if (err.code === "auth/email-already-in-use") message = "Email Already Used";
+                if (err.code === "auth/invalid-email") message = "Invalid Email";
+                if (err.code === "auth/weak-password") message = "Weak Password";
+
+                showToast(message, "error");
+                btn.disabled = isLogin ? false : !strongPassword;
+                btn.innerText = isLogin ? "LOGIN" : "SIGN UP";
             }
-        }, 1000);
+        });
     </script>
 </body>
-
 </html>
