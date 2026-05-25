@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -338,7 +339,7 @@
             </div>
 
             <div class="actions-box">
-                <a id="reward-action-btn" class="btn reward-btn">🎁 Claim Early Reward</a>
+                <button id="reward-action-btn" class="btn reward-btn">🎁 Claim Early Reward</button>
                 <a href="mailto:support@refer-zone.online" class="btn support-btn">✉️ Contact Support</a>
             </div>
             
@@ -407,20 +408,20 @@
     </div>
 
     <script>
-        const launchDate = new Date("June 20, 2026 00:00:00").getTime();
+        // ISO Standard format use kiya hai taake Safari/Old browsers pe crash na ho
+        const launchDate = new Date("2026-06-20T00:00:00").getTime();
         const adLink = "https://www.effectivecpmnetwork.com/ye61iw1vfp?key=89962052ec5f321ea91cc5cfa8c59bef";
         const maxClaimsPerDay = 5;
 
-        // Core State Engine Loading
         let currentPoints = parseInt(localStorage.getItem('rz_points')) || 0;
         let todayClaims = parseInt(localStorage.getItem('rz_today_claims')) || 0;
         let lastClaimDate = localStorage.getItem('rz_last_claim_date') || "";
+        let isProcessingClaim = false; // Double click validation flag
 
         const actionBtn = document.getElementById('reward-action-btn');
         const pointsDisplay = document.getElementById('user-points');
         const limitDisplay = document.getElementById('click-limit-text');
 
-        // Modal Utility Methods
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -440,32 +441,43 @@
 
             if (todayClaims >= maxClaimsPerDay) {
                 actionBtn.classList.add('disabled');
-                actionBtn.removeAttribute('href');
-                actionBtn.removeAttribute('target');
+                actionBtn.disabled = true;
                 actionBtn.textContent = "Limit Reached! Reset at 12 AM";
-            } else {
+            } else if (!isProcessingClaim) {
                 actionBtn.classList.remove('disabled');
-                actionBtn.setAttribute('href', adLink);
-                actionBtn.setAttribute('target', '_blank');
+                actionBtn.disabled = false;
                 actionBtn.textContent = "🎁 Claim Early Reward";
             }
         }
 
-        actionBtn.addEventListener('click', (e) => {
+        actionBtn.addEventListener('click', () => {
             checkMidnightReset();
-            if (todayClaims >= maxClaimsPerDay) {
-                e.preventDefault();
+            
+            if (todayClaims >= maxClaimsPerDay || isProcessingClaim) {
                 return;
             }
 
-            currentPoints += 10;
-            todayClaims += 1;
-            
-            localStorage.setItem('rz_points', currentPoints);
-            localStorage.setItem('rz_today_claims', todayClaims);
-            localStorage.setItem('rz_last_claim_date', new Date().toDateString());
+            isProcessingClaim = true;
+            actionBtn.classList.add('disabled');
+            actionBtn.disabled = true;
+            actionBtn.textContent = "🔄 Opening Ad... Wait 4s";
 
-            setTimeout(updateUI, 500);
+            // Ad ko securely new tab mein open karein
+            window.open(adLink, '_blank');
+
+            // 4 Seconds ka smart buffer taake user ad page par jaye aur return aaye tabhi claim ho
+            setTimeout(() => {
+                currentPoints += 10;
+                todayClaims += 1;
+                
+                localStorage.setItem('rz_points', currentPoints);
+                localStorage.setItem('rz_today_claims', todayClaims);
+                localStorage.setItem('rz_last_claim_date', new Date().toDateString());
+
+                isProcessingClaim = false;
+                updateUI();
+                alert("🎉 10 Points successfully added to your balance!");
+            }, 4000); 
         });
 
         function copyBackupKey() {
