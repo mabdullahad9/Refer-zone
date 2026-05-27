@@ -169,6 +169,7 @@
             gap: 12px;
             margin-bottom: 25px;
             align-items: center;
+            width: 100%;
         }
         .btn {
             display: inline-flex;
@@ -176,8 +177,8 @@
             justify-content: center;
             gap: 8px;
             width: 100%;
-            max-width: 280px;
-            padding: 12px 24px;
+            max-width: 320px;
+            padding: 14px 20px;
             border-radius: 50px;
             font-size: 0.85rem;
             font-weight: 600;
@@ -185,6 +186,7 @@
             transition: all 0.3s ease;
             cursor: pointer;
             border: none;
+            text-align: center;
         }
         .reward-btn {
             background: linear-gradient(135deg, #ffd700, #ff8c00);
@@ -193,6 +195,7 @@
             text-transform: uppercase;
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
+            letter-spacing: 0.5px;
         }
         .reward-btn2 {
             background: linear-gradient(135deg, #00e5ff, #8a2be2);
@@ -201,6 +204,7 @@
             text-transform: uppercase;
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
+            letter-spacing: 0.5px;
         }
         .btn.disabled {
             background: #222533 !important;
@@ -348,8 +352,8 @@
             </div>
 
             <div class="actions-box">
-                <button id="reward-btn-1" class="btn reward-btn">🎁 Earn Eid special reward</button>
-                <button id="reward-btn-2" class="btn reward-btn2">⚡ Earn early bird reward</button>
+                <button id="reward-btn-1" class="btn reward-btn">🎁 Earn Early Bird Rewards</button>
+                <button id="reward-btn-2" class="btn reward-btn2">⚡ Earn Eid Special Reward</button>
                 <a href="mailto:support@refer-zone.online" class="btn support-btn">✉️ Contact Support</a>
             </div>
             
@@ -461,9 +465,9 @@
                 btn2.textContent = "Reset at 12 AM";
             } else {
                 btn1.classList.remove('disabled');
-                btn1.textContent = "🎁 Bonus Claim Server 1";
+                btn1.textContent = "🎁 Earn Early Bird Rewards";
                 btn2.classList.remove('disabled');
-                btn2.textContent = "⚡ Bonus Claim Server 2";
+                btn2.textContent = "⚡ Earn Eid Special Reward";
             }
         }
 
