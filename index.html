@@ -103,7 +103,7 @@
         /* MONETAG BANNER ZONE STYLING */
         .monetag-banner-container {
             margin: 15px 0;
-            min-height: 90px;
+            min-height: 40px;
             background: rgba(255,255,255,0.02);
             border-radius: 12px;
             display: flex;
@@ -346,10 +346,9 @@
             <h2>We Are Launching On:</h2>
             <div class="launch-date-text">20 JUNE 2026 🚀</div>
             
-            <!-- MONETAG TOP BANNER PLACEHOLDER -->
+            <!-- MONETAG AUTO BANNER STATUS PLACEHOLDER -->
             <div class="monetag-banner-container">
-                <!-- Bhai, Monetag dashboard se jo Banner Ad code milega, use is line ke niche paste kar dena -->
-                <p style="font-size: 0.75rem; color: var(--muted);">Monetag Banner Ad Slot</p>
+                <p style="font-size: 0.7rem; color: var(--success);">⚡ Monetag Smart Ads Connected</p>
             </div>
 
             <div class="points-display">
@@ -424,10 +423,17 @@
         </div>
     </div>
 
+    <!-- MONETAG NATIVE ADS SCRIPTS INTEGRATION -->
+    <!-- 1. Vignette Ad Banner (Zone 11071818) -->
+    <script>(function(s){s.dataset.zone='11071818',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    
+    <!-- 2. On-Site Push Notification Tag (Zone 11071816) -->
+    <script>(function(s){s.dataset.zone='11071816',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+
     <script>
         const launchDate = new Date("June 20, 2026 00:00:00").getTime();
         
-        // Ad Links (Adsterra/Monetag SmartLinks)
+        // Ad Links (Adsterra SmartLinks for User Clicks)
         const adLink1 = "https://www.effectivecpmnetwork.com/ye61iw1vfp?key=89962052ec5f321ea91cc5cfa8c59bef";
         const adLink2 = "https://www.effectivecpmnetwork.com/mn0yquw0n?key=254d60432700e3dfdf3e474093d35b51";
         
@@ -437,7 +443,6 @@
         let currentPoints = parseInt(localStorage.getItem('rz_points')) || 0;
         let todayClaims = parseInt(localStorage.getItem('rz_today_claims'));
         
-        // Agar localstorage khali ho to 0 initialize karein
         if (isNaN(todayClaims)) { todayClaims = 0; }
         
         let lastClaimDate = localStorage.getItem('rz_last_claim_date') || "";
@@ -477,7 +482,6 @@
             }
         }
 
-        // FIX SYSTEM: Is function se points direct add nahi hote, pehle ad load hone ka wait lagta hai
         function handleClaim(adUrl, buttonElement, originalText) {
             checkMidnightReset();
             if (todayClaims >= maxClaimsPerDay) {
@@ -485,14 +489,14 @@
                 return;
             }
 
-            // 1. Button par Loading Animation shuru karein aur disable karein
+            // Button Loading State
             buttonElement.classList.add('disabled');
             buttonElement.textContent = "⏳ Loading Ad, Please Wait...";
 
-            // 2. Ad link ko new tab mein open karein
+            // Open SmartLink Ad in new tab
             window.open(adUrl, '_blank');
 
-            // 3. 4 Seconds ke timeout ke baad point confirm karein (taake user ad dekhe)
+            // 4 Seconds loading lock to secure point claim sync
             setTimeout(() => {
                 currentPoints += 10;
                 todayClaims += 1;
@@ -501,17 +505,15 @@
                 localStorage.setItem('rz_today_claims', todayClaims);
                 localStorage.setItem('rz_last_claim_date', new Date().toDateString());
 
-                // UI refresh karein
                 updateUI();
                 
-                // Agar limit bachi hai to button normal karein
                 if (todayClaims < maxClaimsPerDay) {
                     buttonElement.classList.remove('disabled');
                     buttonElement.textContent = originalText;
                 }
                 
                 alert("🎉 Success! 10 Points Aapke Account Mein Add Kar Diye Gaye Hain.");
-            }, 4000); // 4000 milliseconds = 4 seconds delay
+            }, 4000);
         }
 
         btn1.addEventListener('click', () => {
@@ -554,10 +556,9 @@
             } catch(e) { alert("Invalid Backup Key Format!"); }
         }
 
-        // Initialize App State
         updateUI();
 
-        // Countdown Timer Logic
+        // Timer Mechanics Engine
         const timerEngine = setInterval(() => {
             const now = new Date().getTime();
             const distance = launchDate - now;
