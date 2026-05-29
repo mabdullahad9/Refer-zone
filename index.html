@@ -100,6 +100,18 @@
         
         .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5; }
 
+        /* MONETAG BANNER ZONE STYLING */
+        .monetag-banner-container {
+            margin: 15px 0;
+            min-height: 90px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed var(--border);
+        }
+
         /* SCOREBOARD & LIMITS */
         .points-display {
             background: rgba(255, 183, 0, 0.08);
@@ -334,6 +346,12 @@
             <h2>We Are Launching On:</h2>
             <div class="launch-date-text">20 JUNE 2026 🚀</div>
             
+            <!-- MONETAG TOP BANNER PLACEHOLDER -->
+            <div class="monetag-banner-container">
+                <!-- Bhai, Monetag dashboard se jo Banner Ad code milega, use is line ke niche paste kar dena -->
+                <p style="font-size: 0.75rem; color: var(--muted);">Monetag Banner Ad Slot</p>
+            </div>
+
             <div class="points-display">
                 💰 Launch Rewards: <span id="user-points">0</span> Points
                 <span class="limit-text" id="click-limit-text">Remaining Claims Today: 10/10</span>
@@ -370,6 +388,7 @@
         </div>
     </div>
 
+    <!-- MODALS SECTION -->
     <div id="privacy-modal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
@@ -378,19 +397,11 @@
             </div>
             <div class="modal-body">
                 <p><strong>Last Updated: May 2026</strong></p>
-                <p>Welcome to Refer-Zone.online. We respect your privacy and are committed to protecting it. This policy explains how we handle data during our pre-launch events phase.</p>
-                
+                <p>Welcome to Refer-Zone.online. We respect your privacy and are committed to protecting it.</p>
                 <h4>1. Information Collection</h4>
-                <p>We do NOT collect personal data such as your name, email, or IP address on our servers during this countdown phase. All reward points and daily event timers are strictly stored on your own device using local browser storage (localStorage).</p>
-                
+                <p>All reward points and daily event timers are strictly stored on your own device using local browser storage (localStorage).</p>
                 <h4>2. Ad Networks & Third-Party Cookies</h4>
-                <p>We partner with Adsterra and other standard third-party advertising networks to fund our launch rewards ecosystem. When you click on "Claim Early Reward", third-party ad systems may use cookies or device tracking matrices to deliver target advertisements. We do not have direct access to or control over these third-party trackers.</p>
-                
-                <h4>3. Data Security</h4>
-                <p>Since your reward points are stored inside your local browser cache memory, clearing your history or browser storage will wipe your points data. We provide a manual cryptographic Backup Key tool to let you save, download, and copy your score records locally on your device.</p>
-                
-                <h4>4. Changes to This Policy</h4>
-                <p>We will upgrade this policy significantly on June 20, 2026, when our full server architecture, Firebase user login panels, and account systems go live.</p>
+                <p>We partner with Adsterra and Monetag networks to fund our launch rewards ecosystem.</p>
                 <p>For any queries, reach out via: <strong>support@refer-zone.online</strong></p>
             </div>
         </div>
@@ -404,19 +415,11 @@
             </div>
             <div class="modal-body">
                 <p><strong>Last Updated: May 2026</strong></p>
-                <p>By accessing Refer-Zone.online and taking part in our pre-launch booster reward events, you fully agree to the legal terms stated below.</p>
-                
+                <p>By accessing Refer-Zone.online, you agree to the legal terms stated below.</p>
                 <h4>1. Reward Points Eligibility</h4>
-                <p>All points accumulated during this pre-launch booster countdown phase are free promotional items. They carry no real-world cash value until the platform's official launch on June 20, 2026, where they can be migrated into real network dashboard balances.</p>
-                
-                <h4>2. Anti-Fraud & Fair Use Rule</h4>
-                <p>Users are strictly permitted a maximum limit of 10 Reward Claims per 24-hour cycle. Any attempt to manipulate system rules, bypass the cooldown locks, use scripts, bots, auto-clickers, proxies, or perform spam click methods to generate artificial points will trigger automatic invalid logic system loops. This will result in permanent blacklisting of your backup key and a complete ban on the main app registration.</p>
-                
-                <h4>3. Device Storage Liability</h4>
-                <p>Refer-Zone is not responsible for points lost due to browser uninstallation, history cleaning, mobile formatting, or loss of your generated cryptographic Backup Key code.</p>
-                
-                <h4>4. Modification of Event Rules</h4>
-                <p>The management reserves full rights to reset, audit, scale or terminate reward mechanics to protect platform ecosystem integrity against massive click fraud or malicious exploitations.</p>
+                <p>All points accumulated during this pre-launch phase carry no cash value until June 20, 2026.</p>
+                <h4>2. Anti-Fraud Rule</h4>
+                <p>Users are strictly permitted a maximum limit of 10 Reward Claims per 24-hour cycle. Bots and scripts will lead to account bans.</p>
             </div>
         </div>
     </div>
@@ -424,7 +427,7 @@
     <script>
         const launchDate = new Date("June 20, 2026 00:00:00").getTime();
         
-        // Ad Links
+        // Ad Links (Adsterra/Monetag SmartLinks)
         const adLink1 = "https://www.effectivecpmnetwork.com/ye61iw1vfp?key=89962052ec5f321ea91cc5cfa8c59bef";
         const adLink2 = "https://www.effectivecpmnetwork.com/mn0yquw0n?key=254d60432700e3dfdf3e474093d35b51";
         
@@ -432,7 +435,11 @@
 
         // Core State Engine Loading
         let currentPoints = parseInt(localStorage.getItem('rz_points')) || 0;
-        let todayClaims = parseInt(localStorage.getItem('rz_today_claims')) || 0;
+        let todayClaims = parseInt(localStorage.getItem('rz_today_claims'));
+        
+        // Agar localstorage khali ho to 0 initialize karein
+        if (isNaN(todayClaims)) { todayClaims = 0; }
+        
         let lastClaimDate = localStorage.getItem('rz_last_claim_date') || "";
 
         const btn1 = document.getElementById('reward-btn-1');
@@ -440,7 +447,6 @@
         const pointsDisplay = document.getElementById('user-points');
         const limitDisplay = document.getElementById('click-limit-text');
 
-        // Modal Utility Methods
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -471,29 +477,54 @@
             }
         }
 
-        function handleClaim(adUrl) {
+        // FIX SYSTEM: Is function se points direct add nahi hote, pehle ad load hone ka wait lagta hai
+        function handleClaim(adUrl, buttonElement, originalText) {
             checkMidnightReset();
             if (todayClaims >= maxClaimsPerDay) {
+                alert("Aapki aaj ki limit khatam ho chuki hai!");
                 return;
             }
 
-            // 1. Instantly Update state & localStorage
-            currentPoints += 10;
-            todayClaims += 1;
-            
-            localStorage.setItem('rz_points', currentPoints);
-            localStorage.setItem('rz_today_claims', todayClaims);
-            localStorage.setItem('rz_last_claim_date', new Date().toDateString());
+            // 1. Button par Loading Animation shuru karein aur disable karein
+            buttonElement.classList.add('disabled');
+            buttonElement.textContent = "⏳ Loading Ad, Please Wait...";
 
-            // 2. Instantly update UI text
-            updateUI();
-
-            // 3. Trigger ad redirect smoothly in new window/tab
+            // 2. Ad link ko new tab mein open karein
             window.open(adUrl, '_blank');
+
+            // 3. 4 Seconds ke timeout ke baad point confirm karein (taake user ad dekhe)
+            setTimeout(() => {
+                currentPoints += 10;
+                todayClaims += 1;
+                
+                localStorage.setItem('rz_points', currentPoints);
+                localStorage.setItem('rz_today_claims', todayClaims);
+                localStorage.setItem('rz_last_claim_date', new Date().toDateString());
+
+                // UI refresh karein
+                updateUI();
+                
+                // Agar limit bachi hai to button normal karein
+                if (todayClaims < maxClaimsPerDay) {
+                    buttonElement.classList.remove('disabled');
+                    buttonElement.textContent = originalText;
+                }
+                
+                alert("🎉 Success! 10 Points Aapke Account Mein Add Kar Diye Gaye Hain.");
+            }, 4000); // 4000 milliseconds = 4 seconds delay
         }
 
-        btn1.addEventListener('click', () => handleClaim(adLink1));
-        btn2.addEventListener('click', () => handleClaim(adLink2));
+        btn1.addEventListener('click', () => {
+            if (!btn1.classList.contains('disabled')) {
+                handleClaim(adLink1, btn1, "🎁 Earn Early Bird Rewards");
+            }
+        });
+
+        btn2.addEventListener('click', () => {
+            if (!btn2.classList.contains('disabled')) {
+                handleClaim(adLink2, btn2, "⚡ Earn Eid Special Reward");
+            }
+        });
 
         function copyBackupKey() {
             if(currentPoints === 0) {
@@ -502,7 +533,7 @@
             }
             const secureKey = btoa(`RZ-KEY-${currentPoints}-${Math.floor(1000 + Math.random() * 9000)}`);
             navigator.clipboard.writeText(secureKey);
-            alert(`Your Point Backup Key Copied! 🔑\n\nKey: ${secureKey}\n\nSave this key somewhere safe. If your browser data clears, you can restore points using this key.`);
+            alert(`Your Point Backup Key Copied! 🔑\n\nKey: ${secureKey}`);
         }
 
         function restoreBackupKey() {
@@ -523,8 +554,10 @@
             } catch(e) { alert("Invalid Backup Key Format!"); }
         }
 
+        // Initialize App State
         updateUI();
 
+        // Countdown Timer Logic
         const timerEngine = setInterval(() => {
             const now = new Date().getTime();
             const distance = launchDate - now;
@@ -551,6 +584,17 @@
                 btn2.style.display = "none";
             }
         }, 1000);
+
+        // MONETAG SERVICE WORKER REGISTRATION SCRIPT
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(reg) {
+              console.log('Monetag Service Worker Active!', reg);
+            })
+            .catch(function(err) {
+              console.log('Service Worker Fail: ', err);
+            });
+        }
     </script>
 </body>
 
