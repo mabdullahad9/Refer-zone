@@ -62,8 +62,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
         updateGlobalUI();
         
-        // --- ADSGRAM CONTROLLER ACTIVE INITIALIZATION ---
-        // Real Rewarded Ad Unit Block ID Connected Successfully
+        // --- ADSGRAM EARLY CHECK ---
+        // Agar page load par hi window network script ready hai toh pehle hi bind kar lo
         if (window.Adsgram) {
             AdController = window.Adsgram.init({ blockId: "34273" });
         }
@@ -147,12 +147,18 @@ function bindCoinTapLogic() {
     });
 }
 
-// --- ADSGRAM REWARD ENGINE INTEGRATION EVENT HOOKS ---
+// --- UPGRADED RUNTIME ADSGRAM EXECUTION HOOKS ---
 function bindAdsgramTriggers() {
     const watchBtn = document.getElementById("adsgram-bounty-trigger");
     if (!watchBtn) return;
 
     watchBtn.addEventListener("click", function() {
+        // Safe Injection: Agar shuru mein network delay tha, toh ab live initialize karo
+        if (!AdController && window.Adsgram) {
+            AdController = window.Adsgram.init({ blockId: "34273" });
+        }
+
+        // Final verification crash check
         if (!AdController) {
             alert("Adsgram Network Framework offline. Reloading recommended.");
             return;
