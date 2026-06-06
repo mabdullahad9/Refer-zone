@@ -1,0 +1,40 @@
+<div class="home-frame" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 25px; animation: tabFade 0.25s ease-out;">
+    <style>
+        .rz-coin-container { position: relative; margin: 25px 0; }
+        .custom-rz-sikka {
+            width: 225px;
+            height: 225px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffeb94 0%, #f3ba2f 55%, #966b02 100%);
+            border: 8px solid #ffd700;
+            box-shadow: 0 0 35px rgba(243, 186, 47, 0.4), inset 0 4px 10px rgba(255,255,255,0.4), inset 0 -4px 15px rgba(0,0,0,0.4);
+            cursor: pointer;
+            outline: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.05s ease;
+        }
+        .custom-rz-sikka:active { transform: scale(0.94); }
+        .coin-text-overlay {
+            font-size: 64px;
+            font-weight: 900;
+            color: #0d0b12;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            letter-spacing: -1px;
+            filter: drop-shadow(0 2px 2px rgba(255,255,255,0.2));
+        }
+        @keyframes tabFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+
+    <div class="rz-coin-container">
+        <button class="custom-rz-sikka" id="coin-interaction-node">
+            <span class="coin-text-overlay">RZ</span>
+        </button>
+    </div>
+    <div style="font-size: 14px; color: #64748b; margin-top: 10px; background: rgba(255,255,255,0.02); padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+        ⚡ ENERGY STAMINA: 1000/1000
+    </div>
+</div>
+
