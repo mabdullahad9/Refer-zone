@@ -17,28 +17,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Global Variables
+// Global State Variables
 let currentCoins = 0;
 let telegramUser = null;
+let userRef = null;
 
 document.addEventListener("DOMContentLoaded", async function () {
-    // 3. Telegram Security Check
+    // 3. Telegram Security Verification Check
     const tg = window.Telegram?.WebApp;
     const isTelegram = tg && tg.initData && tg.initDataUnsafe && tg.initDataUnsafe.user;
 
     if (!isTelegram) {
-        // Agar normal browser (Chrome/Safari) hai toh block screen dikhao
-        document.body.innerHTML = `
-            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #121212; color: white; text-align: center; padding: 20px; font-family: Arial;">
-                <h2 style="color: #f44336;">Access Denied! ❌</h2>
-                <p style="font-size: 18px;">This game is only available in telegram.</p>
-                <a href="https://t.me/ReferZoneTap_bot" style="margin-top: 20px; padding: 12px 24px; background-color: #2481cc; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Open in Telegram</a>
-            </div>
-        `;
+        // Agar real webapp container nahi hai toh block screen active rakho
+        document.getElementById("denied-screen").style.display = "flex";
         return;
     }
 
-    // Telegram UI ko full screen karna
+    // Telegram UI aur full screen set karna
     tg.ready();
     tg.expand();
 
@@ -47,11 +42,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     const userId = telegramUser.id.toString(); 
     const username = telegramUser.username || telegramUser.first_name || "Player";
 
-    document.getElementById("welcome-msg").innerText = `Welcome, @${username}!`;
-    document.getElementById("game-container").style.display = "block";
+    // Layout Screens mapping toggle karna (Naye IDs ke mutabik)
+    document.getElementById("denied-screen").style.display = "none";
+    document.getElementById("main-viewport").style.display = "block";
+    document.getElementById("master-nav").style.display = "flex";
+    
+    // User tag set karna
+    document.getElementById("player-id").innerText = `@${username}`;
 
-    // 4. Firestore Document Reference (Latest Method)
-    const userRef = doc(db, "users", userId);
+    // 4. Firestore Document Reference Tracking
+    userRef = doc(db, "users", userId);
 
     try {
         const docSnap = await getDoc(userRef);
@@ -59,37 +59,79 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (docSnap.exists()) {
             // Purana user hai toh coins load karo
             currentCoins = docSnap.data().coins || 0;
+            const currentPPH = docSnap.data().pph || 0;
+            document.getElementById("player-pph").innerText = currentPPH;
         } else {
             // Naya user hai toh entry banao
             currentCoins = 0;
             await setDoc(userRef, {
                 username: username,
                 coins: 0,
+                pph: 0,
                 createdAt: serverTimestamp()
             });
         }
-        // Screen par balance dikhana
-        document.getElementById("coin-balance").innerText = currentCoins;
+        // Top Global Header screen par balance sync karna
+        updateGlobalUI();
+        
+        // Pehli dafa default 'home.html' module load karna
+        loadTabModule('home');
+        
     } catch (error) {
-        console.error("Data load karne mein error aya:", error);
+        console.error("Firebase data fetch engine failure:", error);
+    }
+});
+
+// UI Balance Update Utility
+function updateGlobalUI() {
+    const counterDisplay = document.getElementById("master-coin-counter");
+    if (counterDisplay) {
+        counterDisplay.innerText = currentCoins;
+    }
+}
+
+// 5. Multi-File Routing Engine (Async HTML Module Fetcher)
+window.loadTabModule = async function(pageName, element = null) {
+    // Agar custom navigation bar button se trigger hua hai toh active status toggle karo
+    if (element) {
+        document.querySelectorAll('.tab-trigger').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
     }
 
-    // 5. Tap Button ki Click Logic
-    const tapBtn = document.getElementById("tap-button");
-    const balanceDisplay = document.getElementById("coin-balance");
+    try {
+        // External file load karna
+        const response = await fetch(`${pageName}.html`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const htmlContent = await response.text();
+        document.getElementById("content-loader").innerHTML = htmlContent;
+
+        // Agar HOME screen load hui hai toh tap handler event dubara bind karo
+        if (pageName === 'home') {
+            bindCoinTapLogic();
+        }
+    } catch (err) {
+        console.error("Module loading routing crash:", err);
+    }
+};
+
+// 6. Home Tab Coin Interaction Handler
+function bindCoinTapLogic() {
+    const tapBtn = document.getElementById("coin-interaction-node");
+    if (!tapBtn) return;
 
     tapBtn.addEventListener("click", async function () {
-        // 1 Coin plus karo frontend par foran
+        // Frontend rendering fast karne ke liye direct value update
         currentCoins += 1;
-        balanceDisplay.innerText = currentCoins;
+        updateGlobalUI();
 
-        // Background mein Firestore Database mein update bhejna (Latest Method)
+        // Background Cloud Firestore update request push hook
         try {
             await updateDoc(userRef, {
                 coins: currentCoins
             });
         } catch (err) {
-            console.error("Database automatic save failed:", err);
+            console.error("Database cloud write error:", err);
         }
     });
-});
+}
