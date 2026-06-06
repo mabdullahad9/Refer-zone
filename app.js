@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// Accurate Verified System Configuration Mapping
 const firebaseConfig = {
   apiKey: "AIzaSyDkc84Awm5Jv6S886jeztxVX-ISq7gNlpE",
   authDomain: "refer-zone-213bf.firebaseapp.com",
@@ -14,12 +15,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Global State Variables - Upgraded to 6000 Max Cap
+// Global Runtime Core State Management Variables
 let currentCoins = 0;
 const maxEnergy = 6000;
-let currentEnergy = maxEnergy; // Starts at full 6000
+let currentEnergy = maxEnergy; // Set full energy at default initial states
 let telegramUser = null;
 let userRef = null;
+let AdController = null; // Adsgram Active Reference Framework Node
 
 document.addEventListener("DOMContentLoaded", async function () {
     const tg = window.Telegram?.WebApp;
@@ -38,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     tg.expand();
 
     telegramUser = tg.initDataUnsafe.user;
-    const userId = telegramUser.id.toString(); 
+    const userId = telegramUser.id.toString();
     const username = telegramUser.username || telegramUser.first_name || "Player";
 
     document.getElementById("player-id").innerText = `@${username}`;
@@ -59,10 +61,17 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
         }
         updateGlobalUI();
+        
+        // --- ADSGRAM CONTROLLER ACTIVE INITIALIZATION ---
+        // Real Rewarded Ad Unit Block ID Connected Successfully
+        if (window.Adsgram) {
+            AdController = window.Adsgram.init({ blockId: "34273" });
+        }
+
         loadTabModule('home'); 
         
-        // --- HOURLY SMOOTH ENERGY REGENERATION ENGINE ---
-        // Har 3 seconds baad energy +5 restore hogi (Matches exactly 6000 energy per hour)
+        // --- HOURLY SMOOTH REGENERATION LOOP ENGINE ---
+        // Adds +5 stamina points every 3 seconds (Fills exactly 6000/hr)
         setInterval(() => {
             if (currentEnergy < maxEnergy) {
                 currentEnergy = Math.min(maxEnergy, currentEnergy + 5);
@@ -80,7 +89,7 @@ function updateGlobalUI() {
     if (counterDisplay) counterDisplay.innerText = currentCoins;
 }
 
-// Energy Bars UI Sync Function
+// Energy Interface Element Dynamic Syncer
 function updateEnergyUI() {
     const energyText = document.getElementById("energy-current-val");
     const energyFill = document.getElementById("energy-fill-indicator");
@@ -107,10 +116,13 @@ window.loadTabModule = async function(pageName, element = null) {
 
         if (pageName === 'home') {
             bindCoinTapLogic();
-            updateEnergyUI(); // Refresh state immediately on tab focus
+            updateEnergyUI(); // Direct execution frame sync focus
+        }
+        if (pageName === 'tasks') {
+            bindAdsgramTriggers();
         }
     } catch (err) {
-        console.error("Module deployment crashing logic:", err);
+        console.error("Module deployment crashing logic stack trace:", err);
     }
 };
 
@@ -119,10 +131,10 @@ function bindCoinTapLogic() {
     if (!tapBtn) return;
 
     tapBtn.addEventListener("click", async function () {
-        if (currentEnergy <= 0) return;
+        if (currentEnergy <= 0) return; // Disallow system inputs if dry
 
         currentCoins += 1;
-        currentEnergy -= 1; // Subtract exactly 1 energy point per custom RZ tap
+        currentEnergy -= 1;
         
         updateGlobalUI();
         updateEnergyUI();
@@ -132,5 +144,39 @@ function bindCoinTapLogic() {
         } catch (err) {
             console.error("Cloud async sync trace interruption:", err);
         }
+    });
+}
+
+// --- ADSGRAM REWARD ENGINE INTEGRATION EVENT HOOKS ---
+function bindAdsgramTriggers() {
+    const watchBtn = document.getElementById("adsgram-bounty-trigger");
+    if (!watchBtn) return;
+
+    watchBtn.addEventListener("click", function() {
+        if (!AdController) {
+            alert("Adsgram Network Framework offline. Reloading recommended.");
+            return;
+        }
+
+        watchBtn.innerText = "Processing...";
+        watchBtn.disabled = true;
+
+        AdController.show().then((result) => {
+            // Success handler: Ad completed fully
+            currentCoins += 10000; 
+            updateGlobalUI();
+            
+            updateDoc(userRef, { coins: currentCoins })
+                .then(() => alert("Bounty Credited! 💰 +10,000 $RZ added."))
+                .catch(e => console.error("Database cloud write error:", e));
+
+            watchBtn.innerText = "Watch";
+            watchBtn.disabled = false;
+        }).catch((result) => {
+            // Failure/Skipped handler
+            alert("Playback terminated or connection failure.");
+            watchBtn.innerText = "Watch";
+            watchBtn.disabled = false;
+        });
     });
 }
