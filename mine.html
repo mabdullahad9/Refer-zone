@@ -1,0 +1,33 @@
+<div style="padding: 15px 20px; animation: tabFade 0.25s ease-out;">
+    <style>
+        .grid-deck { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .neon-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px; padding: 16px; text-align: center; backdrop-filter: blur(10px);
+        }
+        .card-buy-btn {
+            width:100%; padding: 8px 0; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09); 
+            color:#f3ba2f; border-radius:8px; font-weight:bold; font-size:12px; cursor: pointer; transition: background 0.2s;
+        }
+        .card-buy-btn:active { background: rgba(243, 186, 47, 0.1); }
+    </style>
+    
+    <h3 style="margin:0; color:#00f0ff; font-size: 18px;">Operations Terminal</h3>
+    <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 12px;">Acquire protocols to scale multi-threaded hourly auto payouts.</p>
+    
+    <div class="grid-deck">
+        <div class="neon-card">
+            <span style="font-size: 28px;">📣</span>
+            <h4 style="margin: 8px 0 4px 0; font-size: 14px;">Node Marketing</h4>
+            <p style="color:#10b981; margin:0 0 12px 0; font-size:12px;">+$120/hr</p>
+            <button class="card-buy-btn">Cost: 500</button>
+        </div>
+        <div class="neon-card">
+            <span style="font-size: 28px;">💻</span>
+            <h4 style="margin: 8px 0 4px 0; font-size: 14px;">Web3 Compiler</h4>
+            <p style="color:#10b981; margin:0 0 12px 0; font-size:12px;">+$480/hr</p>
+            <button class="card-buy-btn">Cost: 1.5K</button>
+        </div>
+    </div>
+</div>
+
