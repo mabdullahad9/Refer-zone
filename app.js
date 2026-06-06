@@ -1,8 +1,6 @@
-// 1. Firebase Modules ko Import karna (Latest SDK v9+)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// 2. Aap Ka Exact Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDkc84Awm5Jv6S886jeztxVX-ISq7gNlpE",
   authDomain: "refer-zone-213bf.firebaseapp.com",
@@ -13,56 +11,45 @@ const firebaseConfig = {
   measurementId: "G-EW3Q3QYYH1"
 };
 
-// Firebase aur Firestore ko Initialize karna
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Global State Variables
+// Global State Variables - Upgraded to 6000 Max Cap
 let currentCoins = 0;
+const maxEnergy = 6000;
+let currentEnergy = maxEnergy; // Starts at full 6000
 let telegramUser = null;
 let userRef = null;
 
 document.addEventListener("DOMContentLoaded", async function () {
-    // 3. Telegram Security Verification Check
     const tg = window.Telegram?.WebApp;
     const isTelegram = tg && tg.initData && tg.initDataUnsafe && tg.initDataUnsafe.user;
 
     if (!isTelegram) {
-        // Agar real webapp container nahi hai toh block screen active rakho
         document.getElementById("denied-screen").style.display = "flex";
         return;
     }
 
-    // Telegram UI aur full screen set karna
+    document.getElementById("denied-screen").style.display = "none";
+    document.getElementById("main-viewport").style.display = "block";
+    document.getElementById("master-nav").style.display = "flex";
+
     tg.ready();
     tg.expand();
 
-    // User Data extract karna jo Telegram ne bheja
     telegramUser = tg.initDataUnsafe.user;
     const userId = telegramUser.id.toString(); 
     const username = telegramUser.username || telegramUser.first_name || "Player";
 
-    // Layout Screens mapping toggle karna (Naye IDs ke mutabik)
-    document.getElementById("denied-screen").style.display = "none";
-    document.getElementById("main-viewport").style.display = "block";
-    document.getElementById("master-nav").style.display = "flex";
-    
-    // User tag set karna
     document.getElementById("player-id").innerText = `@${username}`;
-
-    // 4. Firestore Document Reference Tracking
     userRef = doc(db, "users", userId);
 
     try {
         const docSnap = await getDoc(userRef);
-
         if (docSnap.exists()) {
-            // Purana user hai toh coins load karo
             currentCoins = docSnap.data().coins || 0;
-            const currentPPH = docSnap.data().pph || 0;
-            document.getElementById("player-pph").innerText = currentPPH;
+            document.getElementById("player-pph").innerText = docSnap.data().pph || 0;
         } else {
-            // Naya user hai toh entry banao
             currentCoins = 0;
             await setDoc(userRef, {
                 username: username,
@@ -71,67 +58,79 @@ document.addEventListener("DOMContentLoaded", async function () {
                 createdAt: serverTimestamp()
             });
         }
-        // Top Global Header screen par balance sync karna
         updateGlobalUI();
+        loadTabModule('home'); 
         
-        // Pehli dafa default 'home.html' module load karna
-        loadTabModule('home');
-        
+        // --- HOURLY SMOOTH ENERGY REGENERATION ENGINE ---
+        // Har 3 seconds baad energy +5 restore hogi (Matches exactly 6000 energy per hour)
+        setInterval(() => {
+            if (currentEnergy < maxEnergy) {
+                currentEnergy = Math.min(maxEnergy, currentEnergy + 5);
+                updateEnergyUI();
+            }
+        }, 3000);
+
     } catch (error) {
-        console.error("Firebase data fetch engine failure:", error);
+        console.error("Critical core sync error:", error);
     }
 });
 
-// UI Balance Update Utility
 function updateGlobalUI() {
     const counterDisplay = document.getElementById("master-coin-counter");
-    if (counterDisplay) {
-        counterDisplay.innerText = currentCoins;
+    if (counterDisplay) counterDisplay.innerText = currentCoins;
+}
+
+// Energy Bars UI Sync Function
+function updateEnergyUI() {
+    const energyText = document.getElementById("energy-current-val");
+    const energyFill = document.getElementById("energy-fill-indicator");
+    
+    if (energyText && energyFill) {
+        energyText.innerText = currentEnergy;
+        const percentage = (currentEnergy / maxEnergy) * 100;
+        energyFill.style.width = `${percentage}%`;
     }
 }
 
-// 5. Multi-File Routing Engine (Async HTML Module Fetcher)
 window.loadTabModule = async function(pageName, element = null) {
-    // Agar custom navigation bar button se trigger hua hai toh active status toggle karo
     if (element) {
         document.querySelectorAll('.tab-trigger').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
     }
 
     try {
-        // External file load karna
         const response = await fetch(`${pageName}.html`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) throw new Error(`Status verification error: ${response.status}`);
         
         const htmlContent = await response.text();
         document.getElementById("content-loader").innerHTML = htmlContent;
 
-        // Agar HOME screen load hui hai toh tap handler event dubara bind karo
         if (pageName === 'home') {
             bindCoinTapLogic();
+            updateEnergyUI(); // Refresh state immediately on tab focus
         }
     } catch (err) {
-        console.error("Module loading routing crash:", err);
+        console.error("Module deployment crashing logic:", err);
     }
 };
 
-// 6. Home Tab Coin Interaction Handler
 function bindCoinTapLogic() {
     const tapBtn = document.getElementById("coin-interaction-node");
     if (!tapBtn) return;
 
     tapBtn.addEventListener("click", async function () {
-        // Frontend rendering fast karne ke liye direct value update
-        currentCoins += 1;
-        updateGlobalUI();
+        if (currentEnergy <= 0) return;
 
-        // Background Cloud Firestore update request push hook
+        currentCoins += 1;
+        currentEnergy -= 1; // Subtract exactly 1 energy point per custom RZ tap
+        
+        updateGlobalUI();
+        updateEnergyUI();
+
         try {
-            await updateDoc(userRef, {
-                coins: currentCoins
-            });
+            await updateDoc(userRef, { coins: currentCoins });
         } catch (err) {
-            console.error("Database cloud write error:", err);
+            console.error("Cloud async sync trace interruption:", err);
         }
     });
 }
