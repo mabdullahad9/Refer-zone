@@ -25,6 +25,39 @@
             letter-spacing: -1px;
             filter: drop-shadow(0 2px 2px rgba(255,255,255,0.2));
         }
+
+        /* Pro Energy Bar Styling */
+        .energy-box {
+            width: 240px;
+            background: rgba(255,255,255,0.02);
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .energy-text-node {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .energy-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .energy-bar-fill {
+            width: 100%; /* JS se control hoga */
+            height: 100%;
+            background: linear-gradient(90deg, #00f0ff, #3b82f6);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            transition: width 0.1s linear;
+        }
         @keyframes tabFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 
@@ -33,8 +66,14 @@
             <span class="coin-text-overlay">RZ</span>
         </button>
     </div>
-    <div style="font-size: 14px; color: #64748b; margin-top: 10px; background: rgba(255,255,255,0.02); padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
-        ⚡ ENERGY STAMINA: 1000/1000
+
+    <div class="energy-box">
+        <div class="energy-text-node">
+            <span>⚡ Energy Stamina</span>
+            <span><span id="energy-current-val">6000</span>/6000</span>
+        </div>
+        <div class="energy-bar-bg">
+            <div class="energy-bar-fill" id="energy-fill-indicator"></div>
+        </div>
     </div>
 </div>
-
