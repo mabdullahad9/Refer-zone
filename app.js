@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDkc84Awm5Jv6S886jeztxVX-ISq7gNlpE",
@@ -44,32 +44,65 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("player-id").innerText = `@${username}`;
     userRef = doc(db, "users", userId);
 
+    // Telegram Deep Link Parse Karen (tgWebAppStartParam se ref ID nikalna)
+    const urlParams = new URLSearchParams(window.location.search);
+    let referrerId = tg.initDataUnsafe.start_param || urlParams.get("tgWebAppStartParam") || null;
+
     try {
         const docSnap = await getDoc(userRef);
+        
         if (docSnap.exists()) {
+            // Existing User: Login Update aur Active status mark karna
             currentCoins = docSnap.data().coins || 0;
             document.getElementById("player-pph").innerText = docSnap.data().pph || 0;
+            
+            await updateDoc(userRef, {
+                lastActive: serverTimestamp()
+            });
         } else {
-            currentCoins = 0;
+            // New User Registration Process
+            let initialBonus = 0;
+            let referredByField = null;
+
+            // Agar user kisi ke referral link se aaya hai
+            if (referrerId && referrerId !== userId) {
+                referredByField = referrerId;
+                initialBonus = 10000; // Naye user ko 10,000 $RZ mil gaye
+
+                // Referrer (Purane Dost) ko 10,000 $RZ ka bonus cloud par credit karna
+                const referrerRef = doc(db, "users", referrerId);
+                const referrerSnap = await getDoc(referrerRef);
+                if (referrerSnap.exists()) {
+                    const referrerCoins = referrerSnap.data().coins || 0;
+                    await updateDoc(referrerRef, {
+                        coins: referrerCoins + 10000
+                    });
+                }
+            }
+
+            currentCoins = initialBonus;
             await setDoc(userRef, {
                 username: username,
-                coins: 0,
+                coins: currentCoins,
                 pph: 0,
-                createdAt: serverTimestamp()
+                referredBy: referredByField,
+                createdAt: serverTimestamp(),
+                lastActive: serverTimestamp()
             });
+
+            if (initialBonus > 0) {
+                alert("🎉 Welcome! You received 10,000 $RZ Referral Bonus.");
+            }
         }
         
-        // Front-load counters directly on application start frame
         updateGlobalUI();
         updateEnergyUI();
-        bindCoinTapLogic(); // Shuru mein hi coin tap logic active kar do
+        bindCoinTapLogic();
 
-        // Adsgram runtime module verification
         if (window.Adsgram) {
             AdController = window.Adsgram.init({ blockId: "34273" });
         }
         
-        // Smooth stamina increment configuration loop
         setInterval(() => {
             if (currentEnergy < maxEnergy) {
                 currentEnergy = Math.min(maxEnergy, currentEnergy + 5);
@@ -98,7 +131,6 @@ function updateEnergyUI() {
     }
 }
 
-// --- Dynamic View Routing Layout Engine ---
 window.switchRoutingEngine = async function(pageName, element = null) {
     if (element) {
         document.querySelectorAll('.tab-trigger').forEach(el => el.classList.remove('active'));
@@ -109,13 +141,11 @@ window.switchRoutingEngine = async function(pageName, element = null) {
     const dynamicContainer = document.getElementById("tab-content-container");
 
     if (pageName === 'home') {
-        // Real-time toggle: Home layout show, rest hide
         dynamicContainer.style.display = "none";
         homeView.style.display = "flex";
         updateGlobalUI();
         updateEnergyUI();
     } else {
-        // Fetch external views into container layout frame
         homeView.style.display = "none";
         dynamicContainer.style.display = "block";
         
@@ -128,6 +158,11 @@ window.switchRoutingEngine = async function(pageName, element = null) {
 
             if (pageName === 'tasks') {
                 bindAdsgramTriggers();
+            }
+            
+            // Jab user Share tab par jaye to network fetch ho
+            if (pageName === 'share') {
+                renderReferralNetwork();
             }
         } catch (err) {
             console.error("View distribution breaking routing matrix stack:", err);
@@ -149,11 +184,67 @@ function bindCoinTapLogic() {
         updateEnergyUI();
 
         try {
-            await updateDoc(userRef, { coins: currentCoins });
+            await updateDoc(userRef, { coins: currentCoins, lastActive: serverTimestamp() });
         } catch (err) {
             console.error("Cloud data writing sequence interrupted:", err);
         }
     });
+}
+
+// Network tracking module: Dost ki list, Activity aur Earning nikalna
+async function renderReferralNetwork() {
+    const networkBox = document.getElementById("friends-network-list");
+    if (!networkBox || !telegramUser) return;
+
+    networkBox.innerHTML = "<p style='color:#94a3b8; font-size:13px;'>Scanning blockchain registry...</p>";
+
+    try {
+        const userId = telegramUser.id.toString();
+        // Query database to find users referred by this user
+        const q = query(collection(db, "users"), where("referredBy", "==", userId));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            networkBox.innerHTML = "<p style='color:#64748b; font-size:13px; margin-top:15px;'>No nodes deployed yet. Invite friends to build pipeline.</p>";
+            return;
+        }
+
+        let htmlRows = "";
+        const now = Date.now();
+
+        querySnapshot.forEach((friendDoc) => {
+            const data = friendDoc.data();
+            const fName = data.username || "Anonymous Node";
+            const fBalance = data.coins || 0;
+            
+            // Check Activity Status (Agar pichle 5 minute mein user ne click kiya ho)
+            let statusBadge = "<span style='color:#ef4444; font-size:11px;'>● Offline</span>";
+            if (data.lastActive) {
+                const lastActiveMs = data.lastActive.seconds * 1000;
+                if (now - lastActiveMs < 5 * 60 * 1000) { 
+                    statusBadge = "<span style='color:#10b981; font-size:11px; font-weight:bold;'>● Active</span>";
+                }
+            }
+
+            htmlRows += `
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div>
+                        <div style="font-size:14px; font-weight:600; color:#fff;">@${fName}</div>
+                        <div style="margin-top:2px;">${statusBadge}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="color:#f3ba2f; font-weight:bold; font-size:14px;">${fBalance.toLocaleString()} $RZ</div>
+                        <div style="font-size:11px; color:#94a3b8;">Earned</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        networkBox.innerHTML = htmlRows;
+    } catch (err) {
+        console.error("Failed to load friend network mapping:", err);
+        networkBox.innerHTML = "<p style='color:#ef4444; font-size:12px;'>Network synchronization error.</p>";
+    }
 }
 
 function bindAdsgramTriggers() {
@@ -177,7 +268,7 @@ function bindAdsgramTriggers() {
             currentCoins += 10000; 
             updateGlobalUI();
             
-            updateDoc(userRef, { coins: currentCoins })
+            updateDoc(userRef, { coins: currentCoins, lastActive: serverTimestamp() })
                 .then(() => alert("Bounty Credited! 💰 +10,000 $RZ added."))
                 .catch(e => console.error("Cloud state exception handling sync:", e));
 
