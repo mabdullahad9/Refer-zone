@@ -1,21 +1,39 @@
-<div style="padding: 20px; text-align: center; animation: tabFade 0.25s ease-out;">
+<div style="padding: 20px; text-align: center; animation: tabFade 0.25s ease-out; height: 100%; overflow-y: auto;">
     <style>
         .invite-glass {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 20px; padding: 30px 15px; margin-top: 15px; backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 25px 15px; margin-top: 5px; backdrop-filter: blur(10px);
         }
         .action-inv-btn {
             width: 100%; padding: 14px; border: none; font-weight: bold; font-size: 15px;
             background: linear-gradient(90deg, #f3ba2f, #d97706); border-radius: 12px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(243, 186, 47, 0.2);
+            box-shadow: 0 4px 15px rgba(243, 186, 47, 0.2); transition: transform 0.1s;
+        }
+        .action-inv-btn:active { transform: scale(0.98); }
+        .network-header {
+            text-align: left; margin: 25px 0 10px 0; font-size: 16px; color: #00f0ff; font-weight: 600;
+        }
+        .friends-scroll-box {
+            max-height: 250px; overflow-y: auto; padding-right: 4px; text-align: left;
         }
     </style>
     
     <div class="invite-glass">
         <div style="font-size: 42px; margin-bottom: 10px;">🚀</div>
         <h3 style="margin:0 0 8px 0; color:#00f0ff; font-size: 19px;">Alliance Pipeline</h3>
-        <p style="font-size:13px; color:#94a3b8; margin:0 0 25px 0; line-height: 1.4;">Generate deployment link protocols. Collect +5,000 $RZ storage nodes on verification validation.</p>
-        <button class="action-inv-btn" onclick="Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=https://t.me/ReferZoneTap_bot?start=ref')">Deploy Invite Link</button>
+        <p style="font-size:13px; color:#94a3b8; margin:0 0 20px 0; line-height: 1.4;">
+            Invite your friends! Both you and your friend will instantly receive <span style="color:#f3ba2f; font-weight:bold;">+10,000 $RZ</span> upon successful connection verification.
+        </p>
+        
+        <!-- Button trigger loaded with safe dynamic string function evaluation -->
+        <button class="action-inv-btn" onclick="const uid = window.Telegram.WebApp.initDataUnsafe.user.id; window.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=https://t.me/ReferZoneTap_bot/app?startapp=' + uid + '&text=🎁 Join Refer-Zone and claim your 10,000 $RZ starter bounty setup immediately!')">
+            Deploy Invite Link
+        </button>
+    </div>
+
+    <!-- Live Referral Pipeline Section -->
+    <div class="network-header">Active Alliance Connections</div>
+    <div id="friends-network-list" class="friends-scroll-box">
+        <!-- Javascript rendering component loops over data here dynamically -->
     </div>
 </div>
-
