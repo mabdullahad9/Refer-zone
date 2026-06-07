@@ -19,7 +19,7 @@ const maxEnergy = 6000;
 let currentEnergy = maxEnergy;
 let telegramUser = null;
 let userRef = null;
-let AdController = null;
+let AdController = null; // Adsgram fallback controller if needed
 
 document.addEventListener("DOMContentLoaded", async function () {
     const tg = window.Telegram?.WebApp;
@@ -44,7 +44,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("player-id").innerText = `@${username}`;
     userRef = doc(db, "users", userId);
 
-    // Telegram Deep Link Parse Karen (tgWebAppStartParam se ref ID nikalna)
     const urlParams = new URLSearchParams(window.location.search);
     let referrerId = tg.initDataUnsafe.start_param || urlParams.get("tgWebAppStartParam") || null;
 
@@ -52,31 +51,23 @@ document.addEventListener("DOMContentLoaded", async function () {
         const docSnap = await getDoc(userRef);
         
         if (docSnap.exists()) {
-            // Existing User: Login Update aur Active status mark karna
             currentCoins = docSnap.data().coins || 0;
             document.getElementById("player-pph").innerText = docSnap.data().pph || 0;
             
-            await updateDoc(userRef, {
-                lastActive: serverTimestamp()
-            });
+            await updateDoc(userRef, { lastActive: serverTimestamp() });
         } else {
-            // New User Registration Process
             let initialBonus = 0;
             let referredByField = null;
 
-            // Agar user kisi ke referral link se aaya hai
             if (referrerId && referrerId !== userId) {
                 referredByField = referrerId;
-                initialBonus = 10000; // Naye user ko 10,000 $RZ mil gaye
+                initialBonus = 10000;
 
-                // Referrer (Purane Dost) ko 10,000 $RZ ka bonus cloud par credit karna
                 const referrerRef = doc(db, "users", referrerId);
                 const referrerSnap = await getDoc(referrerRef);
                 if (referrerSnap.exists()) {
                     const referrerCoins = referrerSnap.data().coins || 0;
-                    await updateDoc(referrerRef, {
-                        coins: referrerCoins + 10000
-                    });
+                    await updateDoc(referrerRef, { coins: referrerCoins + 10000 });
                 }
             }
 
@@ -99,8 +90,19 @@ document.addEventListener("DOMContentLoaded", async function () {
         updateEnergyUI();
         bindCoinTapLogic();
 
-        if (window.Adsgram) {
-            AdController = window.Adsgram.init({ blockId: "34273" });
+        // 🌟 MONETAG IN-APP INTERSTITIAL AUTOMATION INITIALIZATION
+        // Is config se pure session me ads auto-manage hongi (User experience kharab nahi hoga)
+        if (window.show_11112958) {
+            window.show_11112958({
+              type: 'inApp',
+              inAppSettings: {
+                frequency: 2,       // Max 2 ads dikhein
+                capping: 0.1,       // 6 minutes ke interval ke andar
+                interval: 30,       // Har ad ke beech kam se kam 30 seconds ka gap ho
+                timeout: 5,         // App khulne ke 5 seconds baad pehli ad try kare
+                everyPage: false    // Single page app ke liye session save rakhe (False)
+              }
+            });
         }
         
         setInterval(() => {
@@ -157,10 +159,8 @@ window.switchRoutingEngine = async function(pageName, element = null) {
             dynamicContainer.innerHTML = htmlContent;
 
             if (pageName === 'tasks') {
-                bindAdsgramTriggers();
+                bindMonetagTriggers(); // Monetag triggered runtime injection
             }
-            
-            // Jab user Share tab par jaye to network fetch ho
             if (pageName === 'share') {
                 renderReferralNetwork();
             }
@@ -191,7 +191,6 @@ function bindCoinTapLogic() {
     });
 }
 
-// Network tracking module: Dost ki list, Activity aur Earning nikalna
 async function renderReferralNetwork() {
     const networkBox = document.getElementById("friends-network-list");
     if (!networkBox || !telegramUser) return;
@@ -200,7 +199,6 @@ async function renderReferralNetwork() {
 
     try {
         const userId = telegramUser.id.toString();
-        // Query database to find users referred by this user
         const q = query(collection(db, "users"), where("referredBy", "==", userId));
         const querySnapshot = await getDocs(q);
 
@@ -217,7 +215,6 @@ async function renderReferralNetwork() {
             const fName = data.username || "Anonymous Node";
             const fBalance = data.coins || 0;
             
-            // Check Activity Status (Agar pichle 5 minute mein user ne click kiya ho)
             let statusBadge = "<span style='color:#ef4444; font-size:11px;'>● Offline</span>";
             if (data.lastActive) {
                 const lastActiveMs = data.lastActive.seconds * 1000;
@@ -247,35 +244,35 @@ async function renderReferralNetwork() {
     }
 }
 
-function bindAdsgramTriggers() {
-    const watchBtn = document.getElementById("adsgram-bounty-trigger");
+// 🌟 NEW: MONETAG REWARDED TASK INTEGRATION ENGINE
+function bindMonetagTriggers() {
+    const watchBtn = document.getElementById("adsgram-bounty-trigger"); // keeping id same to map html layout seamlessly
     if (!watchBtn) return;
 
     watchBtn.addEventListener("click", function() {
-        if (!AdController && window.Adsgram) {
-            AdController = window.Adsgram.init({ blockId: "34273" });
-        }
-
-        if (!AdController) {
-            alert("Adsgram Network Framework offline. Reloading recommended.");
+        if (!window.show_11112958) {
+            alert("Monetag SDK Gateway offline. Try reloading.");
             return;
         }
 
-        watchBtn.innerText = "Processing...";
+        watchBtn.innerText = "Streaming...";
         watchBtn.disabled = true;
 
-        AdController.show().then((result) => {
+        // Monetag Rewarded Interstitial Trigger execution loop
+        window.show_11112958().then(() => {
+            // Success Reward handler
             currentCoins += 10000; 
             updateGlobalUI();
             
             updateDoc(userRef, { coins: currentCoins, lastActive: serverTimestamp() })
-                .then(() => alert("Bounty Credited! 💰 +10,000 $RZ added."))
-                .catch(e => console.error("Cloud state exception handling sync:", e));
+                .then(() => alert("Bounty Credited! 💰 +10,000 $RZ directly verified into your cloud wallet node."))
+                .catch(e => console.error("Cloud tracking write error:", e));
 
             watchBtn.innerText = "Watch";
             watchBtn.disabled = false;
-        }).catch((result) => {
-            alert("Playback terminated or connection failure.");
+        }).catch((err) => {
+            console.error("Monetag delivery exception status:", err);
+            alert("Playback interrupted or no ads matching configuration criteria currently available.");
             watchBtn.innerText = "Watch";
             watchBtn.disabled = false;
         });
