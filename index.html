@@ -65,7 +65,6 @@
         .user-tag { font-weight: 600; color: var(--neon-cyan); display: flex; align-items: center; gap: 6px; }
         .pph-tag { font-size: 13px; color: #a78bfa; background: rgba(167,139,250,0.1); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(167,139,250,0.15); }
 
-        /* Sync Coin Counter Typography with $RZ Label */
         .balance-master {
             text-align: center;
             font-size: 44px;
@@ -73,12 +72,6 @@
             color: var(--neon-gold);
             margin: 20px 0;
             text-shadow: 0 0 20px rgba(243, 186, 47, 0.3);
-        }
-        .coin-label {
-            font-size: 20px;
-            color: #94a3b8;
-            margin-left: 5px;
-            font-weight: 600;
         }
 
         /* --- 🪙 HOME VIEW PROTOCOLS (Direct Embedded) --- */
@@ -91,6 +84,7 @@
             animation: viewFade 0.25s ease-out;
         }
 
+        /* UPGRADED: Coin Node with Central Text Alignment Grid */
         #coin-interaction-node {
             width: 200px;
             height: 200px;
@@ -101,6 +95,17 @@
             cursor: pointer;
             transition: transform 0.05s ease;
             -webkit-tap-highlight-color: transparent;
+            
+            /* Built-in Center text logic */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 38px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            font-family: 'Arial Black', Gadget, sans-serif;
+            border: 4px solid #fff;
         }
         #coin-interaction-node:active { transform: scale(0.95); }
 
@@ -122,7 +127,6 @@
         }
         .energy-meta { font-size: 13px; color: #94a3b8; margin-top: 8px; font-weight: 600; }
 
-        /* External Tabs Dynamic Container Node */
         #tab-content-container {
             display: none;
             padding: 10px;
@@ -187,27 +191,24 @@
     </div>
 
     <div id="main-viewport">
-        <!-- Persistent Global Header Section -->
         <div class="header-bar">
             <div class="user-tag">👤 <span id="player-id">Loading...</span></div>
             <div class="pph-tag">🚀 +<span id="player-pph">0</span>/hr</div>
         </div>
         
-        <!-- Persistent Central Coin Balance Display with Added $RZ Token Identity -->
         <div class="balance-master">
-            💰 <span id="master-coin-counter">0</span><span class="coin-label">$RZ</span>
+            💰 <span id="master-coin-counter">0</span>
         </div>
         
-        <!-- 🏠 BUILT-IN HOME MODULE VIEW -->
         <div id="built-in-home">
-            <div id="coin-interaction-node"></div>
+            <div id="coin-interaction-node">$RZ</div>
+            
             <div class="energy-wrapper">
                 <div class="energy-bar-fill" id="energy-fill-indicator"></div>
             </div>
             <div class="energy-meta">⚡ <span id="energy-current-val">6000</span> / 6000</div>
         </div>
 
-        <!-- 📂 CONTAINER FOR DYNAMIC TAB LOADS (Mine, Tasks, Share, Wallet) -->
         <div id="tab-content-container"></div>
     </div>
 
