@@ -1,0 +1,6 @@
+{
+  "appId": "com.referzone.app",
+  "appName": "ReferZone",
+  "webDir": ".",
+  "bundledWebRuntime": false
+}

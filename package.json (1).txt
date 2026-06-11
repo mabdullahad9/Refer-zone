@@ -1,0 +1,16 @@
+{
+  "name": "refer-zone-app",
+  "version": "1.0.0",
+  "description": "ReferZone Android App",
+  "main": "app.js",
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  },
+  "scripts": {
+    "build": "echo 'No build step needed for pure HTML'"
+  },
+  "author": "",
+  "license": "ISC"
+}
